@@ -2,6 +2,7 @@
   "pluginAlias": "SatelIntegra",
   "pluginType": "platform",
   "singular": true,
+  "customUi": true,
   "headerDisplay": "Plugin Homebridge dla centrali alarmowej **Satel Integra** (ETHM-1 / ETHM-1 Plus).",
   "footerDisplay": "Numery stref, wejść i wyjść sprawdzisz w programie **DLOADX** → *Struktura systemu*.",
   "schema": {
