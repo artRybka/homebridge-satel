@@ -1,5 +1,6 @@
 import { EventEmitter } from 'node:events';
 import type { Logging } from 'homebridge';
+import type { ArmMode } from '../types';
 import type { SatelCommands } from './commands';
 import type { SatelConnection } from './connection';
 
@@ -10,7 +11,8 @@ import type { SatelConnection } from './connection';
  * Emits a narrow set of semantic events that accessories subscribe to.
  */
 export interface StatePollerEvents {
-  partitionArmed: (id: number, armed: boolean) => void;
+  /** Fired when a partition's armed state or arm mode changes. */
+  partitionArmed: (id: number, mode: ArmMode | null) => void;
   partitionAlarm: (id: number, alarm: boolean) => void;
   outputState: (id: number, on: boolean) => void;
   zoneViolation: (id: number, violated: boolean) => void;
@@ -26,9 +28,13 @@ export class StatePoller extends EventEmitter {
   private needsFullSync = true;
 
   private partitionsArmed = new Set<number>();
+  private partitionsArmedInMode2 = new Set<number>();
+  private partitionsArmedInMode3 = new Set<number>();
   private partitionsAlarm = new Set<number>();
   private outputs = new Set<number>();
   private zonesViolation = new Set<number>();
+
+  private partitionModes = new Map<number, ArmMode>();
 
   constructor(
     private readonly conn: SatelConnection,
@@ -63,6 +69,9 @@ export class StatePoller extends EventEmitter {
 
   /** Current snapshot for accessories to read initial state. */
   isPartitionArmed(id: number): boolean { return this.partitionsArmed.has(id); }
+  getPartitionArmMode(id: number): ArmMode | null {
+    return this.partitionsArmed.has(id) ? (this.partitionModes.get(id) ?? 0) : null;
+  }
   isPartitionAlarm(id: number): boolean { return this.partitionsAlarm.has(id); }
   isOutputOn(id: number): boolean { return this.outputs.has(id); }
   isZoneViolated(id: number): boolean { return this.zonesViolation.has(id); }
@@ -78,7 +87,11 @@ export class StatePoller extends EventEmitter {
         this.emit('synced');
       } else {
         const nd = await this.cmds.readNewData();
-        if (nd.armedPartitionsReallyChanged()) await this.syncPartitionsArmed();
+        const armChanged =
+          nd.armedPartitionsReallyChanged() ||
+          nd.partitionsArmedInMode2Changed() ||
+          nd.partitionsArmedInMode3Changed();
+        if (armChanged) await this.syncPartitionsArmed();
         if (nd.partitionsAlarmChanged()) await this.syncPartitionsAlarm();
         if (nd.outputsStateChanged()) await this.syncOutputs();
         if (nd.zonesViolationChanged()) await this.syncZonesViolation();
@@ -98,9 +111,26 @@ export class StatePoller extends EventEmitter {
   }
 
   private async syncPartitionsArmed(): Promise<void> {
-    const next = await this.cmds.readPartitionsArmed();
-    this.diff(this.partitionsArmed, next, (id, on) => this.emit('partitionArmed', id, on));
-    this.partitionsArmed = next;
+    const armed = await this.cmds.readPartitionsArmed();
+    const mode2 = await this.cmds.readPartitionsArmedInMode2();
+    const mode3 = await this.cmds.readPartitionsArmedInMode3();
+    const nextModes = new Map<number, ArmMode>();
+    for (const id of armed) {
+      if (mode3.has(id)) nextModes.set(id, 3);
+      else if (mode2.has(id)) nextModes.set(id, 2);
+      else nextModes.set(id, 0); // mode 0 or 1 — cannot distinguish; treat as 0
+    }
+    const prevIds = new Set<number>([...this.partitionsArmed, ...this.partitionModes.keys()]);
+    const allIds = new Set<number>([...prevIds, ...nextModes.keys()]);
+    for (const id of allIds) {
+      const before = this.partitionsArmed.has(id) ? (this.partitionModes.get(id) ?? 0) : null;
+      const after = nextModes.has(id) ? (nextModes.get(id) as ArmMode) : null;
+      if (before !== after) this.emit('partitionArmed', id, after);
+    }
+    this.partitionsArmed = armed;
+    this.partitionsArmedInMode2 = mode2;
+    this.partitionsArmedInMode3 = mode3;
+    this.partitionModes = nextModes;
   }
 
   private async syncPartitionsAlarm(): Promise<void> {

@@ -12,8 +12,9 @@ import { PLATFORM_NAME, PLUGIN_NAME } from './settings';
 import { SatelConnection } from './satel/connection';
 import { SatelCommands, chooseEntityWidth } from './satel/commands';
 import { StatePoller } from './satel/poller';
+import { PartitionAccessory } from './accessories/partitionAccessory';
 import { ZoneAccessory } from './accessories/zoneAccessory';
-import type { SatelPlatformConfig, ZoneConfig } from './types';
+import type { SatelPlatformConfig } from './types';
 
 export class SatelPlatform implements DynamicPlatformPlugin {
   public readonly Service: typeof Service;
@@ -101,13 +102,19 @@ export class SatelPlatform implements DynamicPlatformPlugin {
   private registerAccessories(cfg: SatelPlatformConfig): void {
     const used = new Set<string>();
 
+    for (const partition of cfg.partitions) {
+      const acc = this.ensureAccessory(`satel:partition:${partition.id}`, partition.name, { partition });
+      used.add(acc.UUID);
+      new PartitionAccessory(this, acc, partition);
+    }
+
     for (const zone of cfg.zones) {
       const acc = this.ensureAccessory(`satel:zone:${zone.id}`, zone.name, { zone });
       used.add(acc.UUID);
       new ZoneAccessory(this, acc, zone);
     }
 
-    // Stages 5–8 add: partitions, shutters, switches, locks, temperatures.
+    // Stages 6–8 add: shutters, switches, locks, temperatures.
 
     this.pruneStaleAccessories(used);
   }

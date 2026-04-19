@@ -4,6 +4,8 @@ import {
   NewDataAnswer,
   OutputsStateAnswer,
   PartitionsAlarmAnswer,
+  PartitionsArmedInMode2Answer,
+  PartitionsArmedInMode3Answer,
   ZonesViolationAnswer,
   encodeArmedPartitionsReallyCommand,
   encodeArmInMode0Command,
@@ -18,6 +20,8 @@ import {
   encodeOutputsStateCommand,
   encodeOutputsState256Command,
   encodePartitionsAlarmCommand,
+  encodePartitionsArmedInMode2Command,
+  encodePartitionsArmedInMode3Command,
   encodeZonesViolationCommand,
   encodeZonesViolation256Command,
   type FlagArrayAnswer,
@@ -103,6 +107,18 @@ export class SatelCommands {
   async readPartitionsAlarm(): Promise<Set<number>> {
     const msg = await this.opts.connection.sendCommand(encodePartitionsAlarmCommand());
     assertKind(msg, PartitionsAlarmAnswer, 'PartitionsAlarm');
+    return flagsToIdSet(msg.flags);
+  }
+
+  async readPartitionsArmedInMode2(): Promise<Set<number>> {
+    const msg = await this.opts.connection.sendCommand(encodePartitionsArmedInMode2Command());
+    assertKind(msg, PartitionsArmedInMode2Answer, 'PartitionsArmedInMode2');
+    return flagsToIdSet(msg.flags);
+  }
+
+  async readPartitionsArmedInMode3(): Promise<Set<number>> {
+    const msg = await this.opts.connection.sendCommand(encodePartitionsArmedInMode3Command());
+    assertKind(msg, PartitionsArmedInMode3Answer, 'PartitionsArmedInMode3');
     return flagsToIdSet(msg.flags);
   }
 
