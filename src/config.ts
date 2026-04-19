@@ -5,6 +5,7 @@ import {
 } from './settings';
 import type {
   ArmMode,
+  HomekitMode,
   LockConfig,
   PartitionConfig,
   SatelPlatformConfig,
@@ -20,6 +21,7 @@ const VALID_ZONE_TYPES: ZoneSensorType[] = [
 ];
 
 const VALID_ARM_MODES: ArmMode[] = [0, 1, 2, 3];
+const VALID_HK_MODES: HomekitMode[] = ['off', 'home', 'night', 'away'];
 
 export class ConfigError extends Error {}
 
@@ -100,6 +102,7 @@ function parsePartitions(raw: unknown, log: Logging): PartitionConfig[] {
       name,
       armHomeMode: asArmMode(entry?.armHomeMode, 2),
       armNightMode: asArmMode(entry?.armNightMode, 3),
+      homekitModes: asHomekitModes(entry?.homekitModes),
     });
   }
   return out;
@@ -301,4 +304,17 @@ function asZoneType(v: unknown): ZoneSensorType | undefined {
   return typeof v === 'string' && (VALID_ZONE_TYPES as string[]).includes(v)
     ? (v as ZoneSensorType)
     : undefined;
+}
+
+function asHomekitModes(v: unknown): HomekitMode[] {
+  const all: HomekitMode[] = [...VALID_HK_MODES];
+  if (!Array.isArray(v)) return all;
+  const filtered = v.filter((x): x is HomekitMode => typeof x === 'string' && (VALID_HK_MODES as string[]).includes(x));
+  // Deduplicate while preserving order.
+  const seen = new Set<HomekitMode>();
+  const out: HomekitMode[] = [];
+  for (const m of filtered) {
+    if (!seen.has(m)) { seen.add(m); out.push(m); }
+  }
+  return out.length === 0 ? all : out;
 }

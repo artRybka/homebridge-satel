@@ -10,11 +10,15 @@ export type ZoneSensorType =
 
 export type ArmMode = 0 | 1 | 2 | 3;
 
+/** HomeKit-facing arm modes the user allows the Home app to show. */
+export type HomekitMode = 'off' | 'home' | 'night' | 'away';
+
 export interface PartitionConfig {
   id: number;
   name: string;
   armHomeMode: ArmMode;
   armNightMode: ArmMode;
+  homekitModes: HomekitMode[];
 }
 
 export interface ZoneConfig {

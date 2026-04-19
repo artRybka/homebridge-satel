@@ -97,9 +97,15 @@ export class SatelPlatform implements DynamicPlatformPlugin {
     let discoveryStarted = false;
     this.connection.on('connected', () => {
       this.poller?.start();
-      if (cfg.autoDiscover && !discoveryStarted) {
-        discoveryStarted = true;
-        void this.runDiscovery();
+      if (!discoveryStarted) {
+        const cacheExists = this.discoveryCacheExists();
+        if (cfg.autoDiscover || !cacheExists) {
+          discoveryStarted = true;
+          if (!cfg.autoDiscover && !cacheExists) {
+            this.log.info('Satel: brak zapisanego discovery — jednorazowy skan startowy.');
+          }
+          void this.runDiscovery();
+        }
       }
     });
     this.connection.on('disconnected', () => {
@@ -214,6 +220,14 @@ export class SatelPlatform implements DynamicPlatformPlugin {
 
   private discoveryCachePath(): string {
     return path.join(this.api.user.storagePath(), 'satel-integra-discovery.json');
+  }
+
+  private discoveryCacheExists(): boolean {
+    try {
+      return fs.existsSync(this.discoveryCachePath());
+    } catch {
+      return false;
+    }
   }
 
   private writeDiscoveryCache(result: {

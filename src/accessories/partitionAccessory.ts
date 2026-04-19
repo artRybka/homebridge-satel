@@ -29,7 +29,9 @@ export class PartitionAccessory {
     this.service.getCharacteristic(C.SecuritySystemCurrentState)
       .onGet(() => this.currentState());
 
-    this.service.getCharacteristic(C.SecuritySystemTargetState)
+    const targetChar = this.service.getCharacteristic(C.SecuritySystemTargetState);
+    targetChar.setProps({ validValues: this.hkTargetValidValues() });
+    targetChar
       .onGet(() => this.targetFromCurrent(this.currentState()))
       .onSet((v) => this.setTarget(v));
 
@@ -107,5 +109,28 @@ export class PartitionAccessory {
     if (mode === this.config.armNightMode) return C.SecuritySystemCurrentState.NIGHT_ARM;
     // mode 0, 1, or any not matched above — treat as full away arm.
     return C.SecuritySystemCurrentState.AWAY_ARM;
+  }
+
+  private hkTargetValidValues(): number[] {
+    const { Characteristic: C } = this.platform;
+    const map = {
+      off: C.SecuritySystemTargetState.DISARM,
+      home: C.SecuritySystemTargetState.STAY_ARM,
+      night: C.SecuritySystemTargetState.NIGHT_ARM,
+      away: C.SecuritySystemTargetState.AWAY_ARM,
+    } as const;
+    const out: number[] = [];
+    for (const mode of this.config.homekitModes) {
+      const v = map[mode];
+      if (v !== undefined && !out.includes(v)) out.push(v);
+    }
+    // If everything was filtered out, fall back to all 4 so the control
+    // remains functional rather than rejecting every write.
+    return out.length > 0 ? out : [
+      C.SecuritySystemTargetState.STAY_ARM,
+      C.SecuritySystemTargetState.AWAY_ARM,
+      C.SecuritySystemTargetState.NIGHT_ARM,
+      C.SecuritySystemTargetState.DISARM,
+    ];
   }
 }

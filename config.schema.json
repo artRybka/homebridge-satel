@@ -81,6 +81,16 @@
               "type": "integer",
               "default": 3,
               "enum": [0, 1, 2, 3]
+            },
+            "homekitModes": {
+              "title": "Tryby widoczne w HomeKit",
+              "type": "array",
+              "default": ["off", "home", "night", "away"],
+              "items": {
+                "type": "string",
+                "enum": ["off", "home", "night", "away"]
+              },
+              "description": "Ogranicz listę trybów widocznych w aplikacji Home. Np. jeśli nie używasz trybu Night, usuń go z listy."
             }
           }
         }

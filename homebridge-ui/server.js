@@ -12,11 +12,16 @@ class SatelUiServer extends HomebridgePluginUiServer {
   constructor() {
     super();
     this.onRequest('/discovery', this.getDiscovery.bind(this));
+    this.onRequest('/rescan', this.requestRescan.bind(this));
     this.ready();
   }
 
+  cachePath() {
+    return path.join(this.homebridgeStoragePath, CACHE_FILENAME);
+  }
+
   async getDiscovery() {
-    const cachePath = path.join(this.homebridgeStoragePath, CACHE_FILENAME);
+    const cachePath = this.cachePath();
     if (!fs.existsSync(cachePath)) {
       return { available: false, cachePath };
     }
@@ -33,6 +38,23 @@ class SatelUiServer extends HomebridgePluginUiServer {
       };
     } catch (err) {
       throw new RequestError('Nie udało się odczytać pliku discovery: ' + err.message);
+    }
+  }
+
+  /**
+   * Mark discovery as stale by deleting the cache file. The UI follows up
+   * with homebridge.restartHomebridge() — on the next boot the platform
+   * sees a missing cache and runs a fresh scan of the central unit.
+   */
+  async requestRescan() {
+    const cachePath = this.cachePath();
+    try {
+      if (fs.existsSync(cachePath)) {
+        fs.unlinkSync(cachePath);
+      }
+      return { ok: true, cachePath };
+    } catch (err) {
+      throw new RequestError('Nie udało się usunąć cache: ' + err.message);
     }
   }
 }
