@@ -8,6 +8,11 @@ import type { ArmMode, PartitionConfig } from '../types';
 
 export class PartitionAccessory {
   private readonly service: Service;
+  /** Last target the user picked in HomeKit. Used to disambiguate when
+   *  armHomeMode and armNightMode resolve to the same Satel mode (e.g. both
+   *  set to 2): we can't tell from the central unit alone whether the
+   *  partition is "home" or "night", so we honour the user's last choice. */
+  private lastDesiredTarget: number | null;
 
   constructor(
     private readonly platform: SatelPlatform,
@@ -15,6 +20,9 @@ export class PartitionAccessory {
     private readonly config: PartitionConfig,
   ) {
     const { Service: S, Characteristic: C } = platform;
+
+    const ctx = accessory.context as { lastDesiredTarget?: number };
+    this.lastDesiredTarget = typeof ctx.lastDesiredTarget === 'number' ? ctx.lastDesiredTarget : null;
 
     accessory.getService(S.AccessoryInformation)!
       .setCharacteristic(C.Manufacturer, 'Satel')
@@ -78,6 +86,7 @@ export class PartitionAccessory {
       this.platform.log.warn('Satel: próba ustawienia stanu strefy, ale komendy nie są zainicjowane.');
       return;
     }
+    this.rememberTarget(Number(value));
     try {
       switch (value) {
         case C.SecuritySystemTargetState.STAY_ARM:
@@ -103,11 +112,29 @@ export class PartitionAccessory {
     }
   }
 
+  private rememberTarget(value: number): void {
+    this.lastDesiredTarget = value;
+    (this.accessory.context as { lastDesiredTarget?: number }).lastDesiredTarget = value;
+    this.platform.api.updatePlatformAccessories([this.accessory]);
+  }
+
   private satelModeToHomeKitCurrent(mode: ArmMode): CharacteristicValue {
     const { Characteristic: C } = this.platform;
-    if (mode === this.config.armHomeMode) return C.SecuritySystemCurrentState.STAY_ARM;
-    if (mode === this.config.armNightMode) return C.SecuritySystemCurrentState.NIGHT_ARM;
-    // mode 0, 1, or any not matched above — treat as full away arm.
+    const matchesHome = mode === this.config.armHomeMode;
+    const matchesNight = mode === this.config.armNightMode;
+    if (matchesHome && matchesNight) {
+      // Ambiguous: armHomeMode === armNightMode. The Satel state alone
+      // cannot tell us which HomeKit mode the user intended, so honour
+      // their most recent target — this fixes the perpetual "Arming…"
+      // when current state never matches the chosen target.
+      if (this.lastDesiredTarget === C.SecuritySystemTargetState.NIGHT_ARM) {
+        return C.SecuritySystemCurrentState.NIGHT_ARM;
+      }
+      return C.SecuritySystemCurrentState.STAY_ARM;
+    }
+    if (matchesHome) return C.SecuritySystemCurrentState.STAY_ARM;
+    if (matchesNight) return C.SecuritySystemCurrentState.NIGHT_ARM;
+    // Mode 0 / 1 (or anything outside Home/Night) — treat as full away arm.
     return C.SecuritySystemCurrentState.AWAY_ARM;
   }
 
