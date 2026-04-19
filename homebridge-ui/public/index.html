@@ -571,7 +571,10 @@
             travelUpSec: 25,
             travelDownSec: 25,
             extraPulseSec: 2,
-            pulseMs: 500,
+            // 0 = bistable: plugin holds the output for the full travel time.
+            // >0 only if Satel has a shutter controller configured on the
+            // output and expects a short start/stop pulse.
+            pulseMs: 0,
             _source: 'suggested',
           });
         }
@@ -593,6 +596,11 @@
         h.innerHTML = 'Rolety (para wyjść o tej samej nazwie) <span class="count">(' + shutterRows.length + ')</span>';
         app.appendChild(h);
 
+        const hint = document.createElement('p');
+        hint.className = 'muted';
+        hint.innerHTML = 'Impuls: <b>0</b> (domyślnie) = wyjścia bistabilne — plugin sam trzyma wyjście przez czas otwarcia/zamknięcia. Wartość <b>>0</b> tylko jeśli w Satelu masz kontroler rolet sterowany krótkim impulsem (start/stop).';
+        app.appendChild(hint);
+
         if (shutterRows.length === 0) {
           const p = document.createElement('p');
           p.className = 'muted';
@@ -612,7 +620,7 @@
           '<th>Otwarcie [s]</th>' +
           '<th>Zamknięcie [s]</th>' +
           '<th>Ekstra [s]</th>' +
-          '<th>Impuls [ms]</th>' +
+          '<th title="0 = wyjście bistabilne (plugin steruje czasem). >0 tylko gdy w Satelu jest kontroler rolet na impuls.">Impuls [ms]</th>' +
           '<th>Status</th>' +
           '</tr>';
         table.appendChild(thead);
