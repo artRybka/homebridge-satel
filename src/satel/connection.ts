@@ -2,6 +2,12 @@ import { EventEmitter } from 'node:events';
 import { createConnection, Socket } from 'node:net';
 import type { Logging } from 'homebridge';
 import { decodeMessage, type SatelMessage } from 'satel-integra-integration-protocol';
+// Subpath access to the internal decoder + CRC for raw-mode commands whose
+// responses the top-level decodeMessage() does not dispatch (e.g. 0xEE).
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const RawDecoder = require('satel-integra-integration-protocol/decoder');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const RawCrc = require('satel-integra-integration-protocol/crc');
 import {
   DEFAULT_COMMAND_TIMEOUT_MS,
   DEFAULT_RECONNECT_MAX_MS,
@@ -26,12 +32,23 @@ export interface SatelConnectionEvents {
   error: (err: Error) => void;
 }
 
-interface QueueEntry {
+type DecodedEntry = {
+  mode: 'decoded';
   frame: Buffer;
   resolve: (m: SatelMessage) => void;
   reject: (err: Error) => void;
   timer?: NodeJS.Timeout;
-}
+};
+
+type RawEntry = {
+  mode: 'raw';
+  frame: Buffer;
+  resolve: (payload: Buffer) => void;
+  reject: (err: Error) => void;
+  timer?: NodeJS.Timeout;
+};
+
+type QueueEntry = DecodedEntry | RawEntry;
 
 export class SatelConnection extends EventEmitter {
   private socket: Socket | null = null;
@@ -85,7 +102,23 @@ export class SatelConnection extends EventEmitter {
         reject(new Error('Connection is closed'));
         return;
       }
-      this.queue.push({ frame, resolve, reject });
+      this.queue.push({ mode: 'decoded', frame, resolve, reject });
+      this.processQueue();
+    });
+  }
+
+  /**
+   * Send a command and resolve with the raw destuffed, CRC-verified payload
+   * (command byte + data, no CRC, no framing). Use for protocol commands the
+   * upstream library doesn't dispatch via decodeMessage() — notably 0xEE.
+   */
+  sendRawCommand(frame: Buffer): Promise<Buffer> {
+    return new Promise((resolve, reject) => {
+      if (this.closed) {
+        reject(new Error('Connection is closed'));
+        return;
+      }
+      this.queue.push({ mode: 'raw', frame, resolve, reject });
       this.processQueue();
     });
   }
@@ -132,6 +165,19 @@ export class SatelConnection extends EventEmitter {
   private onData(chunk: Buffer): void {
     this.splitter.append(chunk);
     for (const frame of this.splitter.drainAll()) {
+      const item = this.inflight;
+      if (item?.mode === 'raw') {
+        const payload = decodeRawFrame(frame);
+        this.inflight = null;
+        clearTimeout(item.timer);
+        if (!payload) {
+          item.reject(new Error('Bad frame (raw mode): CRC or framing failed'));
+        } else {
+          item.resolve(payload);
+        }
+        this.processQueue();
+        continue;
+      }
       const msg = decodeMessage(frame);
       if (!msg) {
         const err = new Error(`Bad frame received (${frame.length} bytes)`);
@@ -140,11 +186,10 @@ export class SatelConnection extends EventEmitter {
         continue;
       }
       this.emit('message', msg);
-      if (this.inflight) {
-        const item = this.inflight;
+      if (item) {
         this.inflight = null;
         clearTimeout(item.timer);
-        item.resolve(msg);
+        (item as DecodedEntry).resolve(msg);
         this.processQueue();
       }
     }
@@ -200,4 +245,19 @@ export class SatelConnection extends EventEmitter {
       item?.reject(err);
     }
   }
+}
+
+function decodeRawFrame(frame: Buffer): Buffer | null {
+  const d = new RawDecoder();
+  for (const b of frame.values()) {
+    if (d.addByte(b)) break;
+  }
+  const destuffed: Buffer = d.frame();
+  if (destuffed.length < 3) return null;
+  const c = new RawCrc();
+  c.addBytes(destuffed.subarray(0, destuffed.length - 2));
+  const expected =
+    (destuffed[destuffed.length - 2] << 8) | destuffed[destuffed.length - 1];
+  if (c.crc !== expected) return null;
+  return destuffed.subarray(0, destuffed.length - 2);
 }

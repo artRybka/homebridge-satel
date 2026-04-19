@@ -11,6 +11,7 @@ import { parseConfig, ConfigError } from './config';
 import { PLATFORM_NAME, PLUGIN_NAME } from './settings';
 import { SatelConnection } from './satel/connection';
 import { SatelCommands, chooseEntityWidth } from './satel/commands';
+import { SatelDiscovery, formatDiscoveryAsConfig } from './satel/discovery';
 import { StatePoller } from './satel/poller';
 import { LockAccessory } from './accessories/lockAccessory';
 import { PartitionAccessory } from './accessories/partitionAccessory';
@@ -91,8 +92,13 @@ export class SatelPlatform implements DynamicPlatformPlugin {
       this.log,
     );
 
+    let discoveryStarted = false;
     this.connection.on('connected', () => {
       this.poller?.start();
+      if (cfg.autoDiscover && !discoveryStarted) {
+        discoveryStarted = true;
+        void this.runDiscovery();
+      }
     });
     this.connection.on('disconnected', () => {
       // Poller continues; it gates ticks on connection state internally.
@@ -185,6 +191,20 @@ export class SatelPlatform implements DynamicPlatformPlugin {
     for (const a of stale) {
       const idx = this.accessories.indexOf(a);
       if (idx >= 0) this.accessories.splice(idx, 1);
+    }
+  }
+
+  private async runDiscovery(): Promise<void> {
+    if (!this.connection) return;
+    const discovery = new SatelDiscovery({
+      connection: this.connection,
+      log: this.log,
+    });
+    try {
+      const result = await discovery.discover();
+      this.log.info(formatDiscoveryAsConfig(result));
+    } catch (err) {
+      this.log.warn('Satel: auto-discovery nie powiodło się — %s', (err as Error).message);
     }
   }
 

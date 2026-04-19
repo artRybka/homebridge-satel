@@ -1,7 +1,7 @@
 {
   "name": "homebridge-satel-integra",
   "displayName": "Satel Integra",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Homebridge plugin for Satel Integra alarm system via ETHM-1 / ETHM-1 Plus.",
   "license": "MIT",
   "main": "dist/index.js",
@@ -13,7 +13,7 @@
     "build": "rimraf ./dist && tsc",
     "watch": "npm run build && npm link && nodemon",
     "lint": "eslint src/**/*.ts",
-    "test": "tsx --test test/unit/framing.test.ts test/unit/connection.test.ts test/unit/commands.test.ts",
+    "test": "tsx --test test/unit/framing.test.ts test/unit/connection.test.ts test/unit/commands.test.ts test/unit/discovery.test.ts",
     "prepare": "npm run build",
     "prepublishOnly": "npm run lint && npm run build"
   },

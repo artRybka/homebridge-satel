@@ -56,6 +56,7 @@ export interface SatelPlatformConfig extends PlatformConfig {
   userCode: string;
   integrationKey?: string;
   pollIntervalMs: number;
+  autoDiscover: boolean;
   partitions: PartitionConfig[];
   zones: ZoneConfig[];
   shutters: ShutterConfig[];

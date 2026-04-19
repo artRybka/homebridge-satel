@@ -40,6 +40,7 @@ export function parseConfig(raw: PlatformConfig, log: Logging): SatelPlatformCon
   const port = asInt(raw.port, 'port', DEFAULT_PORT, 1, 65535);
   const pollIntervalMs = asInt(raw.pollIntervalMs, 'pollIntervalMs', DEFAULT_POLL_INTERVAL_MS, 250, 60_000);
   const integrationKey = asString(raw.integrationKey, 'integrationKey') ?? undefined;
+  const autoDiscover = raw.autoDiscover === undefined ? true : Boolean(raw.autoDiscover);
 
   const partitions = parsePartitions(raw.partitions, log);
   const zones = parseZones(raw.zones, log);
@@ -66,6 +67,7 @@ export function parseConfig(raw: PlatformConfig, log: Logging): SatelPlatformCon
     userCode,
     integrationKey,
     pollIntervalMs,
+    autoDiscover,
     partitions,
     zones,
     shutters,

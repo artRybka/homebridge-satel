@@ -45,6 +45,12 @@
         "default": 1000,
         "minimum": 250
       },
+      "autoDiscover": {
+        "title": "Auto-discovery po połączeniu",
+        "type": "boolean",
+        "default": true,
+        "description": "Po pierwszym połączeniu z centralą plugin odpytuje o nazwy partycji, wejść i wyjść i wypisuje w logu gotowy blok do wklejenia do konfiguracji. Nic nie dodaje automatycznie do HomeKit — wejścia/wyjścia dodajesz sam w Config UI X."
+      },
       "partitions": {
         "title": "Strefy (partycje)",
         "type": "array",
@@ -252,6 +258,7 @@
     { "type": "flex", "flex-flow": "row wrap", "items": ["host", "port"] },
     "userCode",
     { "key": "integrationKey", "condition": { "functionBody": "return model.host" } },
+    "autoDiscover",
     { "key": "pollIntervalMs", "type": "number" },
     { "key": "partitions", "type": "array", "expandable": true, "titleTemplate": "Strefa {{ value.id }}: {{ value.name }}" },
     { "key": "zones", "type": "array", "expandable": true, "titleTemplate": "Wejście {{ value.id }}: {{ value.name }}" },
