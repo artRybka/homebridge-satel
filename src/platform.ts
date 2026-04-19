@@ -14,6 +14,7 @@ import { SatelCommands, chooseEntityWidth } from './satel/commands';
 import { StatePoller } from './satel/poller';
 import { LockAccessory } from './accessories/lockAccessory';
 import { PartitionAccessory } from './accessories/partitionAccessory';
+import { ShutterAccessory } from './accessories/shutterAccessory';
 import { SwitchAccessory } from './accessories/switchAccessory';
 import { ZoneAccessory } from './accessories/zoneAccessory';
 import type { SatelPlatformConfig } from './types';
@@ -128,7 +129,17 @@ export class SatelPlatform implements DynamicPlatformPlugin {
       new LockAccessory(this, acc, lk);
     }
 
-    // Stages 7–8 add: shutters, temperatures.
+    for (const sh of cfg.shutters) {
+      const acc = this.ensureAccessory(
+        `satel:shutter:${sh.outputUp}:${sh.outputDown}`,
+        sh.name,
+        { shutter: sh },
+      );
+      used.add(acc.UUID);
+      new ShutterAccessory(this, acc, sh);
+    }
+
+    // Stage 8 adds: temperatures (optional, centrale dependent).
 
     this.pruneStaleAccessories(used);
   }
