@@ -1,5 +1,4 @@
 import type {
-  CharacteristicValue,
   PlatformAccessory,
   Service,
 } from 'homebridge';

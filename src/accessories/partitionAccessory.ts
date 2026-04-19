@@ -33,7 +33,7 @@ export class PartitionAccessory {
       .onGet(() => this.targetFromCurrent(this.currentState()))
       .onSet((v) => this.setTarget(v));
 
-    platform.poller?.on('partitionArmed', (id, mode) => {
+    platform.poller?.on('partitionArmed', (id, _mode) => {
       if (id !== config.id) return;
       this.service.updateCharacteristic(C.SecuritySystemCurrentState, this.currentState());
     });
