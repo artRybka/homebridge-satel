@@ -28,7 +28,15 @@ export interface ShutterConfig {
   name: string;
   outputUp: number;
   outputDown: number;
-  travelTimeSec: number;
+  /** @deprecated use travelUpSec / travelDownSec */
+  travelTimeSec?: number;
+  /** Time for a full open (0 → 100%), seconds. */
+  travelUpSec: number;
+  /** Time for a full close (100 → 0%), seconds. */
+  travelDownSec: number;
+  /** Extra runtime appended when the target is 0% or 100% to ensure the
+   *  blind reaches the endpoint even if the estimate is slightly off. */
+  extraPulseSec: number;
   pulseMs: number;
 }
 

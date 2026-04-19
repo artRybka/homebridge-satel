@@ -138,24 +138,40 @@
               "required": true
             },
             "outputUp": {
-              "title": "Wyjście 'góra'",
+              "title": "Wyjście 'góra' (otwieranie)",
               "type": "integer",
               "minimum": 1,
               "maximum": 256,
               "required": true
             },
             "outputDown": {
-              "title": "Wyjście 'dół'",
+              "title": "Wyjście 'dół' (zamykanie)",
               "type": "integer",
               "minimum": 1,
               "maximum": 256,
               "required": true
             },
-            "travelTimeSec": {
-              "title": "Czas pełnego przejazdu (s)",
+            "travelUpSec": {
+              "title": "Czas pełnego otwarcia (s)",
               "type": "integer",
               "default": 25,
-              "minimum": 1
+              "minimum": 1,
+              "maximum": 600
+            },
+            "travelDownSec": {
+              "title": "Czas pełnego zamknięcia (s)",
+              "type": "integer",
+              "default": 25,
+              "minimum": 1,
+              "maximum": 600
+            },
+            "extraPulseSec": {
+              "title": "Dodatkowy czas przy 0 % i 100 % (s)",
+              "type": "integer",
+              "default": 2,
+              "minimum": 0,
+              "maximum": 30,
+              "description": "Dodatkowy czas dociśnięcia rolety do skrajnego położenia, gdy ustawiasz 0 % lub 100 %."
             },
             "pulseMs": {
               "title": "Długość impulsu sterującego (ms)",

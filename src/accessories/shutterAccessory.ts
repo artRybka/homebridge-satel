@@ -85,6 +85,16 @@ export class ShutterAccessory {
     }
   }
 
+  private travelSecFor(dir: Direction): number {
+    if (dir === 'up') return this.config.travelUpSec;
+    if (dir === 'down') return this.config.travelDownSec;
+    return this.config.travelUpSec;
+  }
+
+  private isEndpointTarget(): boolean {
+    return this.targetPosition === 0 || this.targetPosition === 100;
+  }
+
   private async startMovement(dir: Direction): Promise<void> {
     if (dir === 'idle') return;
     const output = dir === 'up' ? this.config.outputUp : this.config.outputDown;
@@ -98,6 +108,15 @@ export class ShutterAccessory {
       if (this.config.pulseMs > 0) {
         // Momentary pulse: Satel switches the output off on its own.
         setTimeout(() => { void cmds.outputsOff([output]); }, this.config.pulseMs);
+      } else if (this.isEndpointTarget()) {
+        // Bistable mode + endpoint target: keep the output ON for full travel
+        // plus extraPulseSec. In-flight stop is handled by stopMovement.
+        const holdMs = (this.travelSecFor(dir) + this.config.extraPulseSec) * 1000;
+        setTimeout(() => {
+          if (this.direction === dir) {
+            void cmds.outputsOff([output]);
+          }
+        }, holdMs);
       }
     } catch (err) {
       this.platform.log.error('Satel: shutter "%s" start %s failed: %s',
@@ -149,21 +168,22 @@ export class ShutterAccessory {
       this.stopTicker();
       return;
     }
+    const travelSec = this.travelSecFor(this.direction);
     const elapsed = (Date.now() - this.movementStart) / 1000;
-    const delta = (elapsed / this.config.travelTimeSec) * 100;
+    const delta = (elapsed / travelSec) * 100;
     this.movementStart = Date.now();
 
     if (this.direction === 'up') {
       this.currentPosition = clampPct(this.currentPosition + delta);
       if (this.currentPosition >= this.targetPosition) {
         this.currentPosition = this.targetPosition;
-        void this.stopMovement();
+        this.scheduleEndpointSettle();
       }
     } else {
       this.currentPosition = clampPct(this.currentPosition - delta);
       if (this.currentPosition <= this.targetPosition) {
         this.currentPosition = this.targetPosition;
-        void this.stopMovement();
+        this.scheduleEndpointSettle();
       }
     }
 
@@ -171,6 +191,27 @@ export class ShutterAccessory {
       this.platform.Characteristic.CurrentPosition,
       Math.round(this.currentPosition),
     );
+  }
+
+  /**
+   * When the estimated position has reached the target, either stop
+   * immediately (for intermediate positions) or keep the movement state
+   * visible for `extraPulseSec` additional seconds (for 0% / 100%), giving
+   * the motor time to reach the physical endpoint.
+   */
+  private scheduleEndpointSettle(): void {
+    if (this.direction === 'idle') return;
+    if (!this.isEndpointTarget() || this.config.extraPulseSec === 0) {
+      void this.stopMovement();
+      return;
+    }
+    const dir = this.direction;
+    this.stopTicker();
+    setTimeout(() => {
+      if (this.direction === dir) {
+        void this.stopMovement();
+      }
+    }, this.config.extraPulseSec * 1000);
   }
 
   private updatePositionState(): void {

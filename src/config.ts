@@ -139,7 +139,10 @@ function parseShutters(raw: unknown, log: Logging): ShutterConfig[] {
     const name = asString(entry?.name, 'shutter.name');
     const outputUp = asInt(entry?.outputUp, 'shutter.outputUp', NaN, 1, 256);
     const outputDown = asInt(entry?.outputDown, 'shutter.outputDown', NaN, 1, 256);
-    const travelTimeSec = asInt(entry?.travelTimeSec, 'shutter.travelTimeSec', 25, 1, 600);
+    const fallback = asInt(entry?.travelTimeSec, 'shutter.travelTimeSec', 25, 1, 600);
+    const travelUpSec = asInt(entry?.travelUpSec, 'shutter.travelUpSec', fallback, 1, 600);
+    const travelDownSec = asInt(entry?.travelDownSec, 'shutter.travelDownSec', fallback, 1, 600);
+    const extraPulseSec = asInt(entry?.extraPulseSec, 'shutter.extraPulseSec', 2, 0, 30);
     const pulseMs = asInt(entry?.pulseMs, 'shutter.pulseMs', 500, 0, 10_000);
     if (!name || !Number.isFinite(outputUp) || !Number.isFinite(outputDown)) {
       log.error('Pominięto nieprawidłowy wpis w "shutters": %j', entry);
@@ -155,7 +158,16 @@ function parseShutters(raw: unknown, log: Logging): ShutterConfig[] {
       continue;
     }
     seenPairs.add(key);
-    out.push({ name, outputUp, outputDown, travelTimeSec, pulseMs });
+    out.push({
+      name,
+      outputUp,
+      outputDown,
+      travelTimeSec: fallback,
+      travelUpSec,
+      travelDownSec,
+      extraPulseSec,
+      pulseMs,
+    });
   }
   return out;
 }
