@@ -12,7 +12,8 @@ import { PLATFORM_NAME, PLUGIN_NAME } from './settings';
 import { SatelConnection } from './satel/connection';
 import { SatelCommands, chooseEntityWidth } from './satel/commands';
 import { StatePoller } from './satel/poller';
-import type { SatelPlatformConfig } from './types';
+import { ZoneAccessory } from './accessories/zoneAccessory';
+import type { SatelPlatformConfig, ZoneConfig } from './types';
 
 export class SatelPlatform implements DynamicPlatformPlugin {
   public readonly Service: typeof Service;
@@ -92,9 +93,58 @@ export class SatelPlatform implements DynamicPlatformPlugin {
       // Poller continues; it gates ticks on connection state internally.
     });
 
+    this.registerAccessories(cfg);
     this.connection.connect();
     this.log.info('Satel Integra: komunikacja zainicjowana (entityWidth=%d).', entityWidth);
-    // Accessory wiring arrives in Stages 4–8.
+  }
+
+  private registerAccessories(cfg: SatelPlatformConfig): void {
+    const used = new Set<string>();
+
+    for (const zone of cfg.zones) {
+      const acc = this.ensureAccessory(`satel:zone:${zone.id}`, zone.name, { zone });
+      used.add(acc.UUID);
+      new ZoneAccessory(this, acc, zone);
+    }
+
+    // Stages 5–8 add: partitions, shutters, switches, locks, temperatures.
+
+    this.pruneStaleAccessories(used);
+  }
+
+  private ensureAccessory(
+    uuidKey: string,
+    displayName: string,
+    context: Record<string, unknown>,
+  ): PlatformAccessory {
+    const uuid = this.api.hap.uuid.generate(uuidKey);
+    const existing = this.accessories.find((a) => a.UUID === uuid);
+    if (existing) {
+      existing.displayName = displayName;
+      Object.assign(existing.context, context);
+      this.api.updatePlatformAccessories([existing]);
+      this.log.debug('Satel: reuse cached accessory %s (%s)', displayName, uuidKey);
+      return existing;
+    }
+    const accessory = new this.api.platformAccessory(displayName, uuid);
+    Object.assign(accessory.context, context);
+    this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
+    this.accessories.push(accessory);
+    this.log.info('Satel: register new accessory %s (%s)', displayName, uuidKey);
+    return accessory;
+  }
+
+  private pruneStaleAccessories(used: Set<string>): void {
+    const stale = this.accessories.filter((a) => !used.has(a.UUID));
+    if (stale.length === 0) return;
+    for (const a of stale) {
+      this.log.info('Satel: remove stale accessory %s', a.displayName);
+    }
+    this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, stale);
+    for (const a of stale) {
+      const idx = this.accessories.indexOf(a);
+      if (idx >= 0) this.accessories.splice(idx, 1);
+    }
   }
 
   private maxEntityId(cfg: SatelPlatformConfig): number {
