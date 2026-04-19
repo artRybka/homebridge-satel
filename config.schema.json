@@ -286,12 +286,6 @@
     "userCode",
     { "key": "integrationKey", "condition": { "functionBody": "return model.host" } },
     "autoDiscover",
-    { "key": "pollIntervalMs", "type": "number" },
-    { "key": "partitions", "type": "array", "expandable": true, "titleTemplate": "Strefa {{ value.id }}: {{ value.name }}" },
-    { "key": "zones", "type": "array", "expandable": true, "titleTemplate": "Wejście {{ value.id }}: {{ value.name }}" },
-    { "key": "shutters", "type": "array", "expandable": true, "titleTemplate": "Roleta: {{ value.name }}" },
-    { "key": "switches", "type": "array", "expandable": true, "titleTemplate": "Przełącznik: {{ value.name }}" },
-    { "key": "locks", "type": "array", "expandable": true, "titleTemplate": "Zamek: {{ value.name }}" },
-    { "key": "temperatures", "type": "array", "expandable": true, "titleTemplate": "Temperatura: {{ value.name }}" }
+    { "key": "pollIntervalMs", "type": "number" }
   ]
 }
