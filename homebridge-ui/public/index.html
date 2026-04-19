@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <title>Satel Integra — Konfiguracja</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 14px;
+      margin: 0;
+      padding: 16px;
+      color: #24292e;
+    }
+    .banner {
+      background: #f6f8fa;
+      border: 1px solid #d0d7de;
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin-bottom: 16px;
+    }
+    .banner.warn {
+      background: #fff8c5;
+      border-color: #d4a72c;
+    }
+    .banner h3 { margin: 0 0 8px 0; font-size: 15px; }
+    .banner p { margin: 0; }
+    h2 {
+      font-size: 16px;
+      margin: 20px 0 8px 0;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #d0d7de;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    th, td {
+      text-align: left;
+      padding: 6px 8px;
+      border-bottom: 1px solid #eaecef;
+    }
+    th { background: #f6f8fa; font-weight: 600; }
+    td.id { width: 60px; color: #57606a; }
+    td.name { font-weight: 500; }
+    td.type { width: 200px; }
+    td.cb { width: 40px; text-align: center; }
+    select, button {
+      font: inherit;
+      padding: 4px 8px;
+      border: 1px solid #d0d7de;
+      border-radius: 5px;
+      background: white;
+    }
+    button.primary {
+      background: #2da44e;
+      border-color: #2da44e;
+      color: white;
+      padding: 6px 16px;
+      cursor: pointer;
+    }
+    button.primary:hover { background: #2c974b; }
+    button.primary:disabled { background: #94d3a2; cursor: default; }
+    .actions { margin: 20px 0; display: flex; gap: 12px; align-items: center; }
+    .muted { color: #57606a; font-size: 12px; }
+    .stamp { color: #57606a; font-size: 12px; margin-top: 4px; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="banner" id="status">Ładowanie…</div>
+  </div>
+
+  <script>
+    (async () => {
+      const app = document.getElementById('app');
+
+      const ZONE_TYPES = [
+        { value: 'motion', label: 'Ruch (MotionSensor)' },
+        { value: 'contact', label: 'Otwarcie (ContactSensor)' },
+        { value: 'smoke', label: 'Dym (SmokeSensor)' },
+        { value: 'leak', label: 'Zalanie (LeakSensor)' },
+        { value: 'co', label: 'Tlenek węgla (CO)' },
+        { value: 'occupancy', label: 'Obecność (OccupancySensor)' },
+      ];
+
+      const OUTPUT_KINDS = [
+        { value: 'switch-toggle', label: 'Przełącznik bistabilny' },
+        { value: 'switch-pulse', label: 'Przełącznik impulsowy (pulse)' },
+        { value: 'lock', label: 'Elektrozaczep (LockMechanism)' },
+      ];
+
+      let discovery;
+      try {
+        discovery = await homebridge.request('/discovery');
+      } catch (e) {
+        renderBanner('warn', 'Błąd', e.message || String(e));
+        homebridge.showSchemaForm();
+        return;
+      }
+
+      const configArr = await homebridge.getPluginConfig();
+      const cfg = configArr[0] || {};
+
+      if (!discovery.available) {
+        renderBanner(
+          'warn',
+          'Brak zeskanowanych danych',
+          'Włącz <code>autoDiscover</code> w ustawieniach poniżej (domyślnie włączone) i zrestartuj Homebridge. Po pierwszym pełnym skanie centralki wróć tutaj — zobaczysz listę do wyboru. Cache: <code>' + discovery.cachePath + '</code>.',
+        );
+        homebridge.showSchemaForm();
+        return;
+      }
+
+      renderBanner(
+        'ok',
+        'Auto-discovery — wybór urządzeń',
+        'Zaznacz pozycje które chcesz wystawić do HomeKit. Dla wejść wybierz typ (ruch / otwarcie / dym / zalanie / CO / obecność). Dla wyjść wybierz rolę (przełącznik / zamek). Zapis zaktualizuje konfigurację pluginu — standardowy formularz pokazuje się poniżej.',
+      );
+      const stamp = document.createElement('div');
+      stamp.className = 'stamp';
+      stamp.textContent = 'Ostatni skan: ' + (discovery.discoveredAt || 'nieznany');
+      app.appendChild(stamp);
+
+      const configuredPartitions = new Map((cfg.partitions || []).map((p) => [p.id, p]));
+      const configuredZones = new Map((cfg.zones || []).map((z) => [z.id, z]));
+      const configuredSwitches = new Map((cfg.switches || []).map((s) => [s.output, s]));
+      const configuredLocks = new Map((cfg.locks || []).map((l) => [l.output, l]));
+
+      const partRows = renderTable(
+        'Partycje (strefy)',
+        ['', 'Id', 'Nazwa z centrali'],
+        discovery.partitions,
+        (d) => {
+          const existing = configuredPartitions.get(d.id);
+          return {
+            checked: !!existing,
+            cells: [d.id, d.name],
+            data: { existing },
+          };
+        },
+      );
+
+      const zoneRows = renderTable(
+        'Wejścia (czujki)',
+        ['', 'Id', 'Nazwa z centrali', 'Typ HomeKit'],
+        discovery.zones,
+        (d) => {
+          const existing = configuredZones.get(d.id);
+          const select = buildSelect(ZONE_TYPES, existing ? existing.type : 'motion');
+          return {
+            checked: !!existing,
+            cells: [d.id, d.name, select],
+            data: { select, existing },
+          };
+        },
+      );
+
+      const outRows = renderTable(
+        'Wyjścia (przełączniki / zamki)',
+        ['', 'Id', 'Nazwa z centrali', 'Rola'],
+        discovery.outputs,
+        (d) => {
+          const existingSwitch = configuredSwitches.get(d.id);
+          const existingLock = configuredLocks.get(d.id);
+          let preset = 'switch-toggle';
+          if (existingLock) preset = 'lock';
+          else if (existingSwitch && existingSwitch.mode === 'pulse') preset = 'switch-pulse';
+          else if (existingSwitch) preset = 'switch-toggle';
+          const select = buildSelect(OUTPUT_KINDS, preset);
+          return {
+            checked: !!(existingSwitch || existingLock),
+            cells: [d.id, d.name, select],
+            data: { select, existingSwitch, existingLock },
+          };
+        },
+      );
+
+      const actions = document.createElement('div');
+      actions.className = 'actions';
+      const saveBtn = document.createElement('button');
+      saveBtn.className = 'primary';
+      saveBtn.textContent = 'Zapisz wybrane do konfiguracji';
+      actions.appendChild(saveBtn);
+      const msg = document.createElement('span');
+      msg.className = 'muted';
+      actions.appendChild(msg);
+      app.appendChild(actions);
+
+      saveBtn.onclick = async () => {
+        saveBtn.disabled = true;
+        msg.textContent = 'Zapisywanie…';
+
+        const partitions = collect(partRows, (r, d) => ({
+          id: d.id,
+          name: d.name,
+          armHomeMode: (r.data.existing && r.data.existing.armHomeMode) || 2,
+          armNightMode: (r.data.existing && r.data.existing.armNightMode) || 3,
+        }));
+
+        const zones = collect(zoneRows, (r, d) => ({
+          id: d.id,
+          name: d.name,
+          type: r.data.select.value,
+          invert: (r.data.existing && r.data.existing.invert) || false,
+        }));
+
+        const switches = [];
+        const locks = [];
+        for (const r of outRows.rows) {
+          if (!r.cb.checked) continue;
+          const d = r.device;
+          const role = r.data.select.value;
+          if (role === 'lock') {
+            const existing = r.data.existingLock;
+            locks.push({
+              name: d.name,
+              output: d.id,
+              pulseMs: (existing && existing.pulseMs) || 1500,
+            });
+          } else if (role === 'switch-pulse') {
+            const existing = r.data.existingSwitch;
+            switches.push({
+              name: d.name,
+              output: d.id,
+              mode: 'pulse',
+              pulseMs: (existing && existing.pulseMs) || 500,
+            });
+          } else {
+            const existing = r.data.existingSwitch;
+            switches.push({
+              name: d.name,
+              output: d.id,
+              mode: 'toggle',
+              pulseMs: (existing && existing.pulseMs) || 500,
+            });
+          }
+        }
+
+        const next = { ...cfg, partitions, zones, switches, locks };
+        next.shutters = cfg.shutters || [];
+        next.temperatures = cfg.temperatures || [];
+        if (!next.platform) next.platform = 'SatelIntegra';
+
+        try {
+          await homebridge.updatePluginConfig([next]);
+          await homebridge.savePluginConfig();
+          msg.textContent = 'Zapisano. Homebridge sam zrestartuje platformę.';
+        } catch (e) {
+          msg.textContent = 'Błąd zapisu: ' + (e.message || String(e));
+        } finally {
+          saveBtn.disabled = false;
+        }
+      };
+
+      // Show the regular schema form below the picker so the user can tweak
+      // host/port/userCode/etc. without leaving the page.
+      homebridge.showSchemaForm();
+
+      function renderBanner(kind, title, html) {
+        const el = document.getElementById('status') || document.createElement('div');
+        el.className = 'banner' + (kind === 'warn' ? ' warn' : '');
+        el.innerHTML = '<h3>' + title + '</h3><p>' + html + '</p>';
+        if (!el.parentElement) app.appendChild(el);
+      }
+
+      function buildSelect(options, value) {
+        const sel = document.createElement('select');
+        for (const o of options) {
+          const opt = document.createElement('option');
+          opt.value = o.value;
+          opt.textContent = o.label;
+          if (o.value === value) opt.selected = true;
+          sel.appendChild(opt);
+        }
+        return sel;
+      }
+
+      function renderTable(title, headers, devices, rowSpec) {
+        const h = document.createElement('h2');
+        h.textContent = title + ' (' + devices.length + ')';
+        app.appendChild(h);
+
+        if (devices.length === 0) {
+          const p = document.createElement('p');
+          p.className = 'muted';
+          p.textContent = 'Brak zeskanowanych pozycji.';
+          app.appendChild(p);
+          return { rows: [] };
+        }
+
+        const table = document.createElement('table');
+        const thead = document.createElement('thead');
+        const tr = document.createElement('tr');
+        for (const header of headers) {
+          const th = document.createElement('th');
+          th.textContent = header;
+          tr.appendChild(th);
+        }
+        thead.appendChild(tr);
+        table.appendChild(thead);
+
+        const tbody = document.createElement('tbody');
+        const rows = devices.map((device) => {
+          const spec = rowSpec(device);
+          const row = document.createElement('tr');
+
+          const cbTd = document.createElement('td');
+          cbTd.className = 'cb';
+          const cb = document.createElement('input');
+          cb.type = 'checkbox';
+          cb.checked = spec.checked;
+          cbTd.appendChild(cb);
+          row.appendChild(cbTd);
+
+          for (let i = 0; i < spec.cells.length; i++) {
+            const td = document.createElement('td');
+            td.className = i === 0 ? 'id' : i === 1 ? 'name' : 'type';
+            const c = spec.cells[i];
+            if (c instanceof HTMLElement) td.appendChild(c);
+            else td.textContent = String(c);
+            row.appendChild(td);
+          }
+          tbody.appendChild(row);
+          return { device, cb, data: spec.data };
+        });
+        table.appendChild(tbody);
+        app.appendChild(table);
+        return { rows };
+      }
+
+      function collect(tableRows, map) {
+        const out = [];
+        for (const r of tableRows.rows) {
+          if (r.cb.checked) out.push(map(r, r.device));
+        }
+        return out;
+      }
+    })();
+  </script>
+</body>
+</html>

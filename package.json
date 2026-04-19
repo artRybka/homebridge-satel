@@ -1,7 +1,7 @@
 {
   "name": "homebridge-satel-integra",
   "displayName": "Satel Integra",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Homebridge plugin for Satel Integra alarm system via ETHM-1 / ETHM-1 Plus.",
   "license": "MIT",
   "main": "dist/index.js",
@@ -26,8 +26,16 @@
     "homekit"
   ],
   "dependencies": {
+    "@homebridge/plugin-ui-utils": "^2.0.0",
     "satel-integra-integration-protocol": "^1.1.0"
   },
+  "files": [
+    "dist/",
+    "homebridge-ui/",
+    "config.schema.json",
+    "README.md",
+    "LICENSE"
+  ],
   "devDependencies": {
     "@types/node": "^20.12.0",
     "@typescript-eslint/eslint-plugin": "^7.0.0",

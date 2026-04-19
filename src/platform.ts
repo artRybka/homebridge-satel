@@ -1,3 +1,5 @@
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import type {
   API,
   DynamicPlatformPlugin,
@@ -202,9 +204,33 @@ export class SatelPlatform implements DynamicPlatformPlugin {
     });
     try {
       const result = await discovery.discover();
+      this.writeDiscoveryCache(result);
       this.log.info(formatDiscoveryAsConfig(result));
+      this.log.info('Satel: wyniki zapisane do %s — otwórz plugin Settings w Config UI X, aby wybrać które pozycje dodać.', this.discoveryCachePath());
     } catch (err) {
       this.log.warn('Satel: auto-discovery nie powiodło się — %s', (err as Error).message);
+    }
+  }
+
+  private discoveryCachePath(): string {
+    return path.join(this.api.user.storagePath(), 'satel-integra-discovery.json');
+  }
+
+  private writeDiscoveryCache(result: {
+    partitions: Array<{ id: number; name: string; kind: number }>;
+    zones: Array<{ id: number; name: string; kind: number }>;
+    outputs: Array<{ id: number; name: string; kind: number }>;
+  }): void {
+    const p = this.discoveryCachePath();
+    try {
+      fs.writeFileSync(
+        p,
+        JSON.stringify({ discoveredAt: new Date().toISOString(), ...result }, null, 2),
+        'utf8',
+      );
+    } catch (err) {
+      this.log.warn('Satel: nie udało się zapisać cache discovery do %s: %s',
+        p, (err as Error).message);
     }
   }
 
