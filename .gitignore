@@ -1,0 +1,12 @@
+node_modules/
+dist/
+*.log
+.DS_Store
+.env
+.env.*
+!.env.example
+
+# Local test Homebridge config (may contain real host/port/userCode)
+test/hbConfig/config.json
+test/hbConfig/accessories/
+test/hbConfig/persist/

@@ -1,0 +1,263 @@
+{
+  "pluginAlias": "SatelIntegra",
+  "pluginType": "platform",
+  "singular": true,
+  "headerDisplay": "Plugin Homebridge dla centrali alarmowej **Satel Integra** (ETHM-1 / ETHM-1 Plus).",
+  "footerDisplay": "Numery stref, wejść i wyjść sprawdzisz w programie **DLOADX** → *Struktura systemu*.",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "title": "Nazwa platformy",
+        "type": "string",
+        "default": "Satel Integra",
+        "required": true
+      },
+      "host": {
+        "title": "Adres IP modułu ETHM",
+        "type": "string",
+        "format": "ipv4",
+        "required": true
+      },
+      "port": {
+        "title": "Port TCP",
+        "type": "integer",
+        "default": 7094,
+        "required": true,
+        "minimum": 1,
+        "maximum": 65535
+      },
+      "userCode": {
+        "title": "Kod użytkownika Satel",
+        "type": "string",
+        "format": "password",
+        "required": true,
+        "description": "Zalecane: utwórz w Satelu osobnego użytkownika z uprawnieniami tylko do potrzebnych stref i wyjść."
+      },
+      "integrationKey": {
+        "title": "Klucz szyfrowania (opcjonalnie, tylko ETHM-1 Plus)",
+        "type": "string",
+        "format": "password"
+      },
+      "pollIntervalMs": {
+        "title": "Interwał odpytywania (ms)",
+        "type": "integer",
+        "default": 1000,
+        "minimum": 250
+      },
+      "partitions": {
+        "title": "Strefy (partycje)",
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "title": "Numer strefy w Satelu (1–32)",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 32,
+              "required": true
+            },
+            "name": {
+              "title": "Nazwa w HomeKit",
+              "type": "string",
+              "required": true
+            },
+            "armHomeMode": {
+              "title": "Tryb 'Home' (Stay)",
+              "type": "integer",
+              "default": 2,
+              "enum": [0, 1, 2, 3]
+            },
+            "armNightMode": {
+              "title": "Tryb 'Night'",
+              "type": "integer",
+              "default": 3,
+              "enum": [0, 1, 2, 3]
+            }
+          }
+        }
+      },
+      "zones": {
+        "title": "Wejścia (czujki)",
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "title": "Numer wejścia w Satelu (1–256)",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 256,
+              "required": true
+            },
+            "name": {
+              "title": "Nazwa w HomeKit",
+              "type": "string",
+              "required": true
+            },
+            "type": {
+              "title": "Typ czujnika w HomeKit",
+              "type": "string",
+              "required": true,
+              "default": "motion",
+              "oneOf": [
+                { "title": "Ruch (MotionSensor)", "enum": ["motion"] },
+                { "title": "Otwarcie (ContactSensor)", "enum": ["contact"] },
+                { "title": "Dym (SmokeSensor)", "enum": ["smoke"] },
+                { "title": "Zalanie (LeakSensor)", "enum": ["leak"] },
+                { "title": "Tlenek węgla (COSensor)", "enum": ["co"] },
+                { "title": "Obecność (OccupancySensor)", "enum": ["occupancy"] }
+              ]
+            },
+            "invert": {
+              "title": "Odwróć logikę",
+              "type": "boolean",
+              "default": false,
+              "description": "Zaznacz, gdy w Satelu wejście jest typu NC i naruszenie oznacza stan spoczynkowy."
+            }
+          }
+        }
+      },
+      "shutters": {
+        "title": "Rolety",
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "title": "Nazwa",
+              "type": "string",
+              "required": true
+            },
+            "outputUp": {
+              "title": "Wyjście 'góra'",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 256,
+              "required": true
+            },
+            "outputDown": {
+              "title": "Wyjście 'dół'",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 256,
+              "required": true
+            },
+            "travelTimeSec": {
+              "title": "Czas pełnego przejazdu (s)",
+              "type": "integer",
+              "default": 25,
+              "minimum": 1
+            },
+            "pulseMs": {
+              "title": "Długość impulsu sterującego (ms)",
+              "type": "integer",
+              "default": 500,
+              "minimum": 0,
+              "description": "Ustaw 0, jeśli wyjścia są bistabilne (Satel sam zatrzymuje roletę)."
+            }
+          }
+        }
+      },
+      "switches": {
+        "title": "Przełączniki (przekaźniki)",
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "title": "Nazwa",
+              "type": "string",
+              "required": true
+            },
+            "output": {
+              "title": "Numer wyjścia w Satelu",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 256,
+              "required": true
+            },
+            "mode": {
+              "title": "Tryb działania",
+              "type": "string",
+              "default": "toggle",
+              "oneOf": [
+                { "title": "Bistabilny (ON/OFF)", "enum": ["toggle"] },
+                { "title": "Impulsowy (chwilowy ON)", "enum": ["pulse"] }
+              ]
+            },
+            "pulseMs": {
+              "title": "Długość impulsu (ms, tylko dla trybu impulsowego)",
+              "type": "integer",
+              "default": 500,
+              "minimum": 50
+            }
+          }
+        }
+      },
+      "locks": {
+        "title": "Zamki / elektrozaczepy",
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "title": "Nazwa",
+              "type": "string",
+              "required": true
+            },
+            "output": {
+              "title": "Numer wyjścia w Satelu",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 256,
+              "required": true
+            },
+            "pulseMs": {
+              "title": "Długość impulsu otwierającego (ms)",
+              "type": "integer",
+              "default": 1500,
+              "minimum": 50
+            }
+          }
+        }
+      },
+      "temperatures": {
+        "title": "Czujniki temperatury (opcjonalnie)",
+        "type": "array",
+        "description": "Wymaga wyjścia typu 'temperatura' w konfiguracji Satela.",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "title": "Nazwa",
+              "type": "string",
+              "required": true
+            },
+            "output": {
+              "title": "Numer wyjścia temperaturowego",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 256,
+              "required": true
+            }
+          }
+        }
+      }
+    },
+    "required": ["name", "host", "userCode"]
+  },
+  "layout": [
+    { "type": "flex", "flex-flow": "row wrap", "items": ["host", "port"] },
+    "userCode",
+    { "key": "integrationKey", "condition": { "functionBody": "return model.host" } },
+    { "key": "pollIntervalMs", "type": "number" },
+    { "key": "partitions", "type": "array", "expandable": true, "titleTemplate": "Strefa {{ value.id }}: {{ value.name }}" },
+    { "key": "zones", "type": "array", "expandable": true, "titleTemplate": "Wejście {{ value.id }}: {{ value.name }}" },
+    { "key": "shutters", "type": "array", "expandable": true, "titleTemplate": "Roleta: {{ value.name }}" },
+    { "key": "switches", "type": "array", "expandable": true, "titleTemplate": "Przełącznik: {{ value.name }}" },
+    { "key": "locks", "type": "array", "expandable": true, "titleTemplate": "Zamek: {{ value.name }}" },
+    { "key": "temperatures", "type": "array", "expandable": true, "titleTemplate": "Temperatura: {{ value.name }}" }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "watch": ["src"],
+  "ext": "ts",
+  "exec": "npm run build && homebridge -I -D -U ./test/hbConfig",
+  "signal": "SIGTERM",
+  "env": {}
+}
