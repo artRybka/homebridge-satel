@@ -42,7 +42,11 @@ export function parseConfig(raw: PlatformConfig, log: Logging): SatelPlatformCon
   const port = asInt(raw.port, 'port', DEFAULT_PORT, 1, 65535);
   const pollIntervalMs = asInt(raw.pollIntervalMs, 'pollIntervalMs', DEFAULT_POLL_INTERVAL_MS, 250, 60_000);
   const integrationKey = asString(raw.integrationKey, 'integrationKey') ?? undefined;
-  const autoDiscover = raw.autoDiscover === undefined ? true : Boolean(raw.autoDiscover);
+  // Default false: a one-off scan still runs when the cache file is missing
+  // (first install, or after the UI "Pobierz dane z Centrali" button deletes
+  // it). Setting autoDiscover=true in raw config.json forces a scan on every
+  // Homebridge restart.
+  const autoDiscover = raw.autoDiscover === undefined ? false : Boolean(raw.autoDiscover);
 
   const partitions = parsePartitions(raw.partitions, log);
   const zones = parseZones(raw.zones, log);

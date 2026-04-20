@@ -284,8 +284,6 @@
   "layout": [
     { "type": "flex", "flex-flow": "row wrap", "items": ["host", "port"] },
     "userCode",
-    { "key": "integrationKey", "condition": { "functionBody": "return model.host" } },
-    "autoDiscover",
     { "key": "pollIntervalMs", "type": "number" }
   ]
 }

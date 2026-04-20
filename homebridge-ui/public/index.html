@@ -66,7 +66,7 @@ topBar();
 let disc;
 try{disc=await homebridge.request('/discovery')}catch(e){setB('warn','Błąd',msg(e));homebridge.showSchemaForm();return}
 const [cfg]=(await homebridge.getPluginConfig());const C=cfg||{};
-if(!disc.available){setB('warn','Brak zeskanowanych danych','Kliknij „Wymuś skan" lub włącz <code>autoDiscover</code> i zrestartuj Homebridge.');homebridge.showSchemaForm();return}
+if(!disc.available){setB('warn','Brak zeskanowanych danych','Kliknij „Pobierz dane z Centrali Satel Integra" powyżej — plugin wczyta nazwy partycji, wejść i wyjść z centrali i wróci tu z listą.');homebridge.showSchemaForm();return}
 setB('ok','Auto-discovery','Zaznacz urządzenia do wystawienia w HomeKit, popraw nazwy i typy. Pary wyjść o tej samej nazwie pojawiają się jako „Rolety".');
 const st=document.createElement('div');st.className='stamp';st.textContent='Ostatni skan: '+(disc.discoveredAt||'—');app.appendChild(st);
 
@@ -220,7 +220,7 @@ homebridge.showSchemaForm();
 // helpers
 function topBar(){
   const bar=document.createElement('div');bar.className='topbar';
-  const b=document.createElement('button');b.className='s';b.textContent='Wymuś ponowny skan z centrali';
+  const b=document.createElement('button');b.className='s';b.textContent='Pobierz dane z Centrali Satel Integra';
   const m=document.createElement('span');m.className='muted';
   bar.appendChild(b);bar.appendChild(m);app.appendChild(bar);
   b.onclick=async()=>{
