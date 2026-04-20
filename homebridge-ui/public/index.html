@@ -16,6 +16,9 @@ h2 .count{color:#57606a;font-weight:400;font-size:12px}
 .stamp{color:#57606a;font-size:12px;margin:2px 0 10px}
 .card{border:1px solid #d0d7de;border-radius:6px;padding:10px 12px;margin-bottom:6px;background:#fff;transition:background .15s,border-color .15s}
 .card.on{background:#f4fbf6;border-color:#b7e1c0}
+.card:not(.on){cursor:pointer}
+.card:not(.on):hover{background:#f6f8fa;border-color:#afb8c1}
+.card:not(.on) .card-body{display:none}
 .card-head{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .card-head .id{color:#8c959f;font-variant-numeric:tabular-nums;min-width:32px;font-size:12px;font-weight:500}
 .card-head .title{font-weight:600;flex:1;min-width:120px}
@@ -132,6 +135,7 @@ shutterRows.forEach(s=>{
   const t=document.createElement('span');t.className='title';t.textContent=s.name+' ('+s.outputUp+'/'+s.outputDown+')';head.appendChild(t);
   const badge=statusBadge(configured);head.appendChild(badge);
   cb.addEventListener('change',()=>{card.classList.toggle('on',cb.checked);badge.replaceWith(statusBadge(cb.checked));});
+  card.addEventListener('click',(e)=>{if(card.classList.contains('on'))return;if(e.target.closest('input,select,button,label'))return;cb.checked=!cb.checked;cb.dispatchEvent(new Event('change'))});
   card.appendChild(head);
   const b=document.createElement('div');b.className='card-body';
   b.appendChild(field('Nazwa w HomeKit',nameI));
@@ -236,6 +240,9 @@ function mkCard(id,satelName,on){
   const t=document.createElement('span');t.className='title';t.textContent=satelName;head.appendChild(t);
   const b=statusBadge(on);head.appendChild(b);
   cb.addEventListener('change',()=>{card.classList.toggle('on',cb.checked);b.replaceWith(statusBadge(cb.checked))});
+  // Click anywhere on a collapsed card toggles the checkbox, so the user
+  // doesn't have to hit the small box exactly.
+  card.addEventListener('click',(e)=>{if(card.classList.contains('on'))return;if(e.target.closest('input,select,button,label'))return;cb.checked=!cb.checked;cb.dispatchEvent(new Event('change'))});
   card.appendChild(head);app.appendChild(card);
   return {card,cb,badge:b};
 }
