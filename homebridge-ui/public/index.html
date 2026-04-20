@@ -4,42 +4,48 @@
 <meta charset="utf-8">
 <title>Satel Integra</title>
 <style>
-body{font-family:system-ui,sans-serif;font-size:14px;margin:0;padding:16px;color:#24292e}
-.banner{background:#f6f8fa;border:1px solid #d0d7de;border-radius:6px;padding:12px 16px;margin-bottom:12px}
+body{font-family:system-ui,sans-serif;font-size:14px;margin:0;padding:16px 16px 80px;color:#24292e}
+.banner{background:#f6f8fa;border:1px solid #d0d7de;border-radius:6px;padding:10px 14px;margin-bottom:10px}
 .banner.warn{background:#fff8c5;border-color:#d4a72c}
-.banner h3{margin:0 0 6px;font-size:15px}
-.banner p{margin:0}
-h2{font-size:16px;margin:18px 0 6px;padding-bottom:4px;border-bottom:1px solid #d0d7de}
-h2 .count{color:#57606a;font-weight:400;font-size:13px}
+.banner h3{margin:0 0 4px;font-size:14px}
+.banner p{margin:0;font-size:13px}
+h2{font-size:15px;margin:18px 0 8px;padding-bottom:4px;border-bottom:1px solid #d0d7de;position:sticky;top:0;background:#fff;z-index:2}
+h2 .count{color:#57606a;font-weight:400;font-size:12px}
 .topbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
 .muted{color:#57606a;font-size:12px}
-.stamp{color:#57606a;font-size:12px;margin:2px 0 12px}
-.card{border:1px solid #d0d7de;border-radius:6px;padding:10px 12px;margin-bottom:8px;background:#fff}
+.stamp{color:#57606a;font-size:12px;margin:2px 0 10px}
+.card{border:1px solid #d0d7de;border-radius:6px;padding:10px 12px;margin-bottom:6px;background:#fff;transition:background .15s,border-color .15s}
 .card.on{background:#f4fbf6;border-color:#b7e1c0}
 .card-head{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.card-head .id{color:#57606a;font-variant-numeric:tabular-nums;min-width:28px}
+.card-head .id{color:#8c959f;font-variant-numeric:tabular-nums;min-width:32px;font-size:12px;font-weight:500}
 .card-head .title{font-weight:600;flex:1;min-width:120px}
-.card-body{display:flex;flex-wrap:wrap;gap:10px 16px;margin-top:8px;align-items:flex-end}
-.f{display:flex;flex-direction:column;gap:2px}
-.f label{font-size:11px;text-transform:uppercase;color:#57606a;letter-spacing:.04em}
-.hint{font-size:11px;color:#57606a;margin-top:2px}
-input[type=text],input[type=number],select{font:inherit;padding:4px 6px;border:1px solid #d0d7de;border-radius:5px;background:#fff;box-sizing:border-box}
-input[type=text]{width:200px}
-input[type=number]{width:90px}
-select{min-width:160px}
+.card-body{display:flex;flex-wrap:wrap;gap:10px 16px;margin-top:8px;align-items:flex-start}
+.f{display:flex;flex-direction:column;gap:3px;min-width:fit-content}
+.f label{font-size:10.5px;text-transform:uppercase;color:#57606a;letter-spacing:.05em;font-weight:600}
+.hint{font-size:11px;color:#8c959f;margin-top:2px;font-style:italic}
+input[type=text],input[type=number],select{font:inherit;padding:5px 8px;border:1px solid #d0d7de;border-radius:5px;background:#fff;box-sizing:border-box;color:#24292e}
+input[type=text]:focus,input[type=number]:focus,select:focus{outline:none;border-color:#0969da;box-shadow:0 0 0 3px rgba(9,105,218,.1)}
+input[type=text]{width:220px}
+input[type=number]{width:80px}
+input[type=number]:disabled{background:#f6f8fa;color:#8c959f;cursor:not-allowed}
+select{min-width:180px}
 button{font:inherit;padding:5px 10px;border:1px solid #d0d7de;border-radius:5px;background:#fff;cursor:pointer}
-button.p{background:#2da44e;border-color:#2da44e;color:#fff;padding:7px 16px}
+button:hover{background:#f6f8fa}
+button.p{background:#2da44e;border-color:#2da44e;color:#fff;padding:8px 20px;font-weight:500}
 button.p:hover{background:#2c974b}
-button.p:disabled{background:#94d3a2}
-button.s{background:#0969da;border-color:#0969da;color:#fff;padding:6px 14px}
+button.p:disabled{background:#94d3a2;cursor:default}
+button.s{background:#0969da;border-color:#0969da;color:#fff;padding:7px 16px;font-weight:500}
 button.s:hover{background:#0550ae}
-button.s:disabled{background:#80b3e6}
-.badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600}
+button.s:disabled{background:#80b3e6;cursor:default}
+.badge{display:inline-block;padding:2px 10px;border-radius:999px;font-size:11px;font-weight:600;white-space:nowrap}
 .badge.ok{background:#dafbe1;color:#1a7f37}
 .badge.warn{background:#fff8c5;color:#7a5c00}
-.hkm{display:flex;gap:8px 12px;flex-wrap:wrap}
-.hkm label{display:inline-flex;gap:4px;cursor:pointer;font-size:12px}
-.actions{margin:16px 0;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.hkm{display:flex;gap:6px 14px;flex-wrap:wrap}
+.hkm label{display:inline-flex;gap:4px;cursor:pointer;font-size:12px;user-select:none}
+.savebar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #d0d7de;padding:10px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;box-shadow:0 -2px 8px rgba(0,0,0,.05);z-index:10}
+.sh-ud{display:flex;gap:4px;align-items:center}
+.sh-ud .id{font-weight:500;color:#24292e;font-size:13px;min-width:22px;text-align:center}
+.sh-ud button{padding:3px 6px;font-size:11px;min-width:26px}
 </style>
 </head>
 <body>
@@ -130,8 +136,7 @@ shutterRows.forEach(s=>{
   const b=document.createElement('div');b.className='card-body';
   b.appendChild(field('Nazwa w HomeKit',nameI));
   const gd=document.createElement('div');gd.className='f';gd.innerHTML='<label>Góra / Dół</label>';
-  const wrap=document.createElement('div');wrap.style.display='flex';wrap.style.gap='6px';wrap.style.alignItems='center';
-  up.style.minWidth='32px';dn.style.minWidth='32px';
+  const wrap=document.createElement('div');wrap.className='sh-ud';
   wrap.appendChild(up);wrap.appendChild(document.createTextNode('/'));wrap.appendChild(dn);wrap.appendChild(swap);
   gd.appendChild(wrap);b.appendChild(gd);
   b.appendChild(field('Otwarcie [s]',tU));
@@ -166,11 +171,11 @@ singleOut.forEach(d=>{
   oItems.push({d,cb,badge,nameI,rs,pu,xs,xl});
 });
 
-// SAVE
-const act=document.createElement('div');act.className='actions';
-const save=document.createElement('button');save.className='p';save.textContent='Zapisz wybrane do konfiguracji';act.appendChild(save);
+// SAVE — sticky bar so it's always reachable with many cards
+const act=document.createElement('div');act.className='savebar';
+const save=document.createElement('button');save.className='p';save.textContent='Zapisz konfigurację';act.appendChild(save);
 const saveMsg=document.createElement('span');saveMsg.className='muted';act.appendChild(saveMsg);
-app.appendChild(act);
+document.body.appendChild(act);
 save.onclick=async()=>{
   save.disabled=true;saveMsg.textContent='Zapisywanie…';
   const partitions=pItems.filter(r=>r.cb.checked).map(r=>({
@@ -260,7 +265,7 @@ function buildShutters(outs,existing){
 }
 function refreshBadges(){
   [...pItems,...zItems,...oItems].forEach(r=>{const nb=statusBadge(r.cb.checked);r.badge.replaceWith(nb);r.badge=nb});
-  shItems.forEach(r=>{/* shutter badges handled via change listener */});
+  shItems.forEach(r=>{const card=r.cb.closest('.card');const b=card&&card.querySelector('.badge');if(b)b.replaceWith(statusBadge(r.cb.checked))});
 }
 function msg(e){return(e&&e.message)||String(e)}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
