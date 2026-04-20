@@ -22,11 +22,11 @@
       },
       "port": {
         "title": "Port TCP",
-        "type": "integer",
-        "default": 7094,
+        "type": "string",
+        "default": "7094",
         "required": true,
-        "minimum": 1,
-        "maximum": 65535
+        "pattern": "^[0-9]{1,5}$",
+        "description": "Numer portu TCP (1–65535). Domyślnie 7094."
       },
       "userCode": {
         "title": "Kod użytkownika Satel",

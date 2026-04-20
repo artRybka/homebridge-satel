@@ -12,14 +12,16 @@ interface ShutterContext {
 }
 
 const TICK_MS = 200;
+/** Throttle for writing currentPosition to accessory.context during movement. */
+const PERSIST_INTERVAL_MS = 1000;
 
 /**
  * Roller shutter driven by two Satel outputs (one for "up", one for "down").
  *
  * Satel doesn't report the blind's physical position, so we estimate it in
- * software from `travelTimeSec`. State is persisted in accessory.context so
- * the estimate survives Homebridge restarts. After a power event the user
- * should nudge the target to 0% or 100% to resynchronise.
+ * software from `travelUpSec` / `travelDownSec`. State is persisted in
+ * accessory.context on every movement and at interval so the estimate
+ * survives Homebridge restarts (and even crashes mid-movement).
  */
 export class ShutterAccessory {
   private readonly service: Service;
@@ -29,6 +31,7 @@ export class ShutterAccessory {
   private direction: Direction = 'idle';
   private tickTimer: NodeJS.Timeout | null = null;
   private movementStart = 0;
+  private lastPersistAt = 0;
 
   constructor(
     private readonly platform: SatelPlatform,
@@ -38,9 +41,16 @@ export class ShutterAccessory {
     const { Service: S, Characteristic: C } = platform;
 
     this.context = accessory.context as ShutterContext;
-    this.currentPosition = clampPct(this.context.position ?? 0);
+    const restored = this.context.position;
+    this.currentPosition = clampPct(restored ?? 0);
     this.targetPosition = this.currentPosition;
     this.context.position = this.currentPosition;
+    if (typeof restored === 'number') {
+      this.platform.log.info(
+        'Satel: roleta "%s" — odtworzona pozycja %d %% (z cache)',
+        config.name, Math.round(this.currentPosition),
+      );
+    }
 
     accessory.getService(S.AccessoryInformation)!
       .setCharacteristic(C.Manufacturer, 'Satel')
@@ -191,6 +201,14 @@ export class ShutterAccessory {
       this.platform.Characteristic.CurrentPosition,
       Math.round(this.currentPosition),
     );
+    this.maybePersistPosition();
+  }
+
+  private maybePersistPosition(): void {
+    const now = Date.now();
+    if (now - this.lastPersistAt < PERSIST_INTERVAL_MS) return;
+    this.lastPersistAt = now;
+    this.persistPosition();
   }
 
   /**

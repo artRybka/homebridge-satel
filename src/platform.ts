@@ -145,8 +145,13 @@ export class SatelPlatform implements DynamicPlatformPlugin {
     }
 
     for (const sh of cfg.shutters) {
+      // UUID uses min:max so that swapping up/down in the picker does NOT
+      // change the accessory identity and wipe cached position.
+      const [lo, hi] = sh.outputUp < sh.outputDown
+        ? [sh.outputUp, sh.outputDown]
+        : [sh.outputDown, sh.outputUp];
       const acc = this.ensureAccessory(
-        `satel:shutter:${sh.outputUp}:${sh.outputDown}`,
+        `satel:shutter:${lo}:${hi}`,
         sh.name,
         { shutter: sh },
       );
