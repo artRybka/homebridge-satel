@@ -1,725 +1,270 @@
 <!doctype html>
 <html lang="pl">
 <head>
-  <meta charset="utf-8">
-  <title>Satel Integra — Konfiguracja</title>
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      font-size: 14px;
-      margin: 0;
-      padding: 16px;
-      color: #24292e;
-    }
-    .banner {
-      background: #f6f8fa;
-      border: 1px solid #d0d7de;
-      border-radius: 6px;
-      padding: 12px 16px;
-      margin-bottom: 16px;
-    }
-    .banner.warn { background: #fff8c5; border-color: #d4a72c; }
-    .banner h3 { margin: 0 0 8px 0; font-size: 15px; }
-    .banner p { margin: 0; }
-    h2 {
-      font-size: 16px;
-      margin: 20px 0 8px 0;
-      padding-bottom: 4px;
-      border-bottom: 1px solid #d0d7de;
-    }
-    h2 .count { color: #57606a; font-weight: 400; font-size: 13px; }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-    }
-    th, td {
-      text-align: left;
-      padding: 6px 8px;
-      border-bottom: 1px solid #eaecef;
-      vertical-align: middle;
-    }
-    th { background: #f6f8fa; font-weight: 600; }
-    td.id { width: 60px; color: #57606a; font-variant-numeric: tabular-nums; }
-    td.cb { width: 40px; text-align: center; }
-    td.num { width: 90px; }
-    td.status { width: 130px; }
-    td.name-cell .satel-name {
-      display: block;
-      font-size: 11px;
-      color: #57606a;
-      margin-top: 2px;
-    }
-    input[type=text], input[type=number], select {
-      font: inherit;
-      padding: 4px 6px;
-      border: 1px solid #d0d7de;
-      border-radius: 5px;
-      background: white;
-      box-sizing: border-box;
-    }
-    input[type=text] { width: 160px; }
-    input[type=number] { width: 80px; }
-    button {
-      font: inherit;
-      padding: 4px 8px;
-      border: 1px solid #d0d7de;
-      border-radius: 5px;
-      background: white;
-      cursor: pointer;
-    }
-    button.primary {
-      background: #2da44e;
-      border-color: #2da44e;
-      color: white;
-      padding: 6px 16px;
-    }
-    button.primary:hover { background: #2c974b; }
-    button.primary:disabled { background: #94d3a2; cursor: default; }
-    button.secondary {
-      background: #0969da;
-      border-color: #0969da;
-      color: white;
-      padding: 6px 14px;
-    }
-    button.secondary:hover { background: #0550ae; }
-    button.secondary:disabled { background: #80b3e6; cursor: default; }
-    .badge {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.02em;
-    }
-    .badge.ok   { background: #dafbe1; color: #1a7f37; }
-    .badge.warn { background: #fff8c5; color: #7a5c00; }
-    .actions { margin: 20px 0; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-    .muted { color: #57606a; font-size: 12px; }
-    .stamp { color: #57606a; font-size: 12px; margin: 4px 0 16px 0; }
-    .hk-modes { display: flex; flex-wrap: wrap; gap: 6px 10px; font-size: 12px; }
-    .hk-modes label { display: inline-flex; align-items: center; gap: 3px; cursor: pointer; }
-    .top-bar {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      flex-wrap: wrap;
-      margin-bottom: 12px;
-    }
-  </style>
+<meta charset="utf-8">
+<title>Satel Integra</title>
+<style>
+body{font-family:system-ui,sans-serif;font-size:14px;margin:0;padding:16px;color:#24292e}
+.banner{background:#f6f8fa;border:1px solid #d0d7de;border-radius:6px;padding:12px 16px;margin-bottom:12px}
+.banner.warn{background:#fff8c5;border-color:#d4a72c}
+.banner h3{margin:0 0 6px;font-size:15px}
+.banner p{margin:0}
+h2{font-size:16px;margin:18px 0 6px;padding-bottom:4px;border-bottom:1px solid #d0d7de}
+h2 .count{color:#57606a;font-weight:400;font-size:13px}
+.topbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.muted{color:#57606a;font-size:12px}
+.stamp{color:#57606a;font-size:12px;margin:2px 0 12px}
+.card{border:1px solid #d0d7de;border-radius:6px;padding:10px 12px;margin-bottom:8px;background:#fff}
+.card.on{background:#f4fbf6;border-color:#b7e1c0}
+.card-head{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.card-head .id{color:#57606a;font-variant-numeric:tabular-nums;min-width:28px}
+.card-head .title{font-weight:600;flex:1;min-width:120px}
+.card-body{display:flex;flex-wrap:wrap;gap:10px 16px;margin-top:8px;align-items:flex-end}
+.f{display:flex;flex-direction:column;gap:2px}
+.f label{font-size:11px;text-transform:uppercase;color:#57606a;letter-spacing:.04em}
+.hint{font-size:11px;color:#57606a;margin-top:2px}
+input[type=text],input[type=number],select{font:inherit;padding:4px 6px;border:1px solid #d0d7de;border-radius:5px;background:#fff;box-sizing:border-box}
+input[type=text]{width:200px}
+input[type=number]{width:90px}
+select{min-width:160px}
+button{font:inherit;padding:5px 10px;border:1px solid #d0d7de;border-radius:5px;background:#fff;cursor:pointer}
+button.p{background:#2da44e;border-color:#2da44e;color:#fff;padding:7px 16px}
+button.p:hover{background:#2c974b}
+button.p:disabled{background:#94d3a2}
+button.s{background:#0969da;border-color:#0969da;color:#fff;padding:6px 14px}
+button.s:hover{background:#0550ae}
+button.s:disabled{background:#80b3e6}
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600}
+.badge.ok{background:#dafbe1;color:#1a7f37}
+.badge.warn{background:#fff8c5;color:#7a5c00}
+.hkm{display:flex;gap:8px 12px;flex-wrap:wrap}
+.hkm label{display:inline-flex;gap:4px;cursor:pointer;font-size:12px}
+.actions{margin:16px 0;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+</style>
 </head>
 <body>
-  <div id="app">
-    <div class="banner" id="status">Ładowanie…</div>
-  </div>
+<div id="app"><div class="banner" id="status">Ładowanie…</div></div>
+<script>
+(async()=>{
+const app=document.getElementById('app');
+const sBanner=document.getElementById('status');
+const ZT=[['motion','Ruch'],['contact','Otwarcie'],['smoke','Dym'],['leak','Zalanie'],['co','CO'],['occupancy','Obecność']];
+const AM=[[0,'Tryb 0 (pełne)'],[1,'Tryb 1'],[2,'Tryb 2 (dzienne)'],[3,'Tryb 3 (nocne)']];
+const HK=[['off','Off'],['home','Home'],['night','Night'],['away','Away']];
+const OR=[['switch-toggle','Przełącznik bistabilny'],['switch-pulse','Przełącznik impulsowy'],['lock','Elektrozaczep']];
 
-  <script>
-    (async () => {
-      const app = document.getElementById('app');
-      const statusBanner = document.getElementById('status');
+topBar();
+let disc;
+try{disc=await homebridge.request('/discovery')}catch(e){setB('warn','Błąd',msg(e));homebridge.showSchemaForm();return}
+const [cfg]=(await homebridge.getPluginConfig());const C=cfg||{};
+if(!disc.available){setB('warn','Brak zeskanowanych danych','Kliknij „Wymuś skan" lub włącz <code>autoDiscover</code> i zrestartuj Homebridge.');homebridge.showSchemaForm();return}
+setB('ok','Auto-discovery','Zaznacz urządzenia do wystawienia w HomeKit, popraw nazwy i typy. Pary wyjść o tej samej nazwie pojawiają się jako „Rolety".');
+const st=document.createElement('div');st.className='stamp';st.textContent='Ostatni skan: '+(disc.discoveredAt||'—');app.appendChild(st);
 
-      const ZONE_TYPES = [
-        { value: 'motion', label: 'Ruch (MotionSensor)' },
-        { value: 'contact', label: 'Otwarcie (ContactSensor)' },
-        { value: 'smoke', label: 'Dym (SmokeSensor)' },
-        { value: 'leak', label: 'Zalanie (LeakSensor)' },
-        { value: 'co', label: 'Tlenek węgla (CO)' },
-        { value: 'occupancy', label: 'Obecność (OccupancySensor)' },
-      ];
-      const ARM_MODES = [
-        { value: 0, label: 'Tryb 0 (pełne)' },
-        { value: 1, label: 'Tryb 1' },
-        { value: 2, label: 'Tryb 2 (dzienne)' },
-        { value: 3, label: 'Tryb 3 (nocne)' },
-      ];
-      const HK_MODES = [
-        { value: 'off',   label: 'Off (Disarm)' },
-        { value: 'home',  label: 'Home (Stay)' },
-        { value: 'night', label: 'Night' },
-        { value: 'away',  label: 'Away' },
-      ];
-      const OUTPUT_ROLES = [
-        { value: 'switch-toggle', label: 'Przełącznik bistabilny' },
-        { value: 'switch-pulse', label: 'Przełącznik impulsowy' },
-        { value: 'lock', label: 'Elektrozaczep (LockMechanism)' },
-      ];
+const eP=new Map((C.partitions||[]).map(p=>[p.id,p]));
+const eZ=new Map((C.zones||[]).map(z=>[z.id,z]));
+const eSw=new Map((C.switches||[]).map(s=>[s.output,s]));
+const eLk=new Map((C.locks||[]).map(l=>[l.output,l]));
+const eSh=C.shutters||[];
 
-      renderTopBar();
+// PARTITIONS
+const pItems=[];
+section('Partycje (strefy)',disc.partitions.length);
+disc.partitions.forEach(d=>{
+  const x=eP.get(d.id);
+  const nameI=inp('text',(x&&x.name)||d.name);
+  const home=sel(AM,(x&&x.armHomeMode)??2);
+  const night=sel(AM,(x&&x.armNightMode)??3);
+  const modes=hkModes((x&&x.homekitModes)||['off','home','night','away']);
+  const {card,cb,badge}=mkCard(d.id,d.name,!!x);
+  card.appendChild(body([
+    field('Nazwa w HomeKit',nameI,d.name),
+    field('Tryb Home',home),
+    field('Tryb Night',night),
+    field('Widoczne w HomeKit',modes.el),
+  ]));
+  pItems.push({d,cb,badge,nameI,home,night,modes,x});
+});
 
-      let discovery;
-      try {
-        discovery = await homebridge.request('/discovery');
-      } catch (e) {
-        setBanner('warn', 'Błąd odczytu discovery', (e && e.message) || String(e));
-        homebridge.showSchemaForm();
-        return;
-      }
+// ZONES
+const zItems=[];
+section('Wejścia (czujki)',disc.zones.length);
+disc.zones.forEach(d=>{
+  const x=eZ.get(d.id);
+  const nameI=inp('text',(x&&x.name)||d.name);
+  const ts=sel(ZT,(x&&x.type)||'motion');
+  const {card,cb,badge}=mkCard(d.id,d.name,!!x);
+  card.appendChild(body([
+    field('Nazwa w HomeKit',nameI,d.name),
+    field('Typ HomeKit',ts),
+  ]));
+  zItems.push({d,cb,badge,nameI,ts,x});
+});
 
-      const configArr = await homebridge.getPluginConfig();
-      const cfg = configArr[0] || {};
+// SHUTTERS
+const shutterRows=buildShutters(disc.outputs,eSh);
+const usedSh=new Set();shutterRows.forEach(s=>{usedSh.add(s.outputUp);usedSh.add(s.outputDown)});
+section('Rolety (para wyjść o tej samej nazwie)',shutterRows.length);
+const shHint=document.createElement('p');shHint.className='muted';shHint.innerHTML='Impuls <b>0</b> = wyjścia bistabilne (plugin steruje czasem). <b>&gt;0</b> = kontroler rolet w Satelu (impuls start/stop).';app.appendChild(shHint);
+const shItems=[];
+if(shutterRows.length===0){
+  const p=document.createElement('p');p.className='muted';p.textContent='Brak par. Dodaj rolety ręcznie w config.json jeśli trzeba.';app.appendChild(p);
+}
+shutterRows.forEach(s=>{
+  const nameI=inp('text',s.name);
+  const up=numCell(s.outputUp),dn=numCell(s.outputDown);
+  const swap=document.createElement('button');swap.textContent='↕';swap.title='Zamień górę i dół';
+  swap.onclick=e=>{e.preventDefault();const a=up.textContent;up.textContent=dn.textContent;dn.textContent=a};
+  const tU=inp('number',s.travelUpSec,{min:1,max:600});
+  const tD=inp('number',s.travelDownSec,{min:1,max:600});
+  const ex=inp('number',s.extraPulseSec,{min:0,max:30});
+  const pu=inp('number',s.pulseMs,{min:0,max:10000,step:50});
+  const configured=s._src==='cfg';
+  const card=document.createElement('div');card.className='card'+(configured?' on':'');
+  const head=document.createElement('div');head.className='card-head';
+  const cb=document.createElement('input');cb.type='checkbox';cb.checked=configured;head.appendChild(cb);
+  const t=document.createElement('span');t.className='title';t.textContent=s.name+' ('+s.outputUp+'/'+s.outputDown+')';head.appendChild(t);
+  const badge=statusBadge(configured);head.appendChild(badge);
+  cb.addEventListener('change',()=>{card.classList.toggle('on',cb.checked);badge.replaceWith(statusBadge(cb.checked));});
+  card.appendChild(head);
+  const b=document.createElement('div');b.className='card-body';
+  b.appendChild(field('Nazwa w HomeKit',nameI));
+  const gd=document.createElement('div');gd.className='f';gd.innerHTML='<label>Góra / Dół</label>';
+  const wrap=document.createElement('div');wrap.style.display='flex';wrap.style.gap='6px';wrap.style.alignItems='center';
+  up.style.minWidth='32px';dn.style.minWidth='32px';
+  wrap.appendChild(up);wrap.appendChild(document.createTextNode('/'));wrap.appendChild(dn);wrap.appendChild(swap);
+  gd.appendChild(wrap);b.appendChild(gd);
+  b.appendChild(field('Otwarcie [s]',tU));
+  b.appendChild(field('Zamknięcie [s]',tD));
+  b.appendChild(field('Ekstra [s]',ex));
+  b.appendChild(field('Impuls [ms]',pu));
+  card.appendChild(b);
+  app.appendChild(card);
+  shItems.push({cb,nameI,up,dn,tU,tD,ex,pu});
+});
 
-      if (!discovery.available) {
-        setBanner(
-          'warn',
-          'Brak zeskanowanych danych',
-          'Kliknij „Wymuś skan" powyżej, lub włącz <code>autoDiscover</code> w formularzu poniżej i zrestartuj Homebridge.',
-        );
-        homebridge.showSchemaForm();
-        return;
-      }
+// OUTPUTS
+const singleOut=disc.outputs.filter(o=>!usedSh.has(o.id));
+const oItems=[];
+section('Wyjścia pojedyncze (switch / lock)',singleOut.length);
+singleOut.forEach(d=>{
+  const xs=eSw.get(d.id),xl=eLk.get(d.id);
+  let role='switch-toggle',pms=500,hk=d.name;
+  if(xl){role='lock';pms=xl.pulseMs||1500;hk=xl.name||d.name}
+  else if(xs){role=xs.mode==='pulse'?'switch-pulse':'switch-toggle';pms=xs.pulseMs||500;hk=xs.name||d.name}
+  const nameI=inp('text',hk);
+  const rs=sel(OR,role);
+  const pu=inp('number',pms,{min:50,max:10000,step:50});
+  const update=()=>{pu.disabled=rs.value==='switch-toggle';if(pu.disabled&&!pu.value)pu.value='500'};
+  rs.addEventListener('change',update);update();
+  const {card,cb,badge}=mkCard(d.id,d.name,!!(xs||xl));
+  card.appendChild(body([
+    field('Nazwa w HomeKit',nameI,d.name),
+    field('Rola',rs),
+    field('Impuls [ms]',pu),
+  ]));
+  oItems.push({d,cb,badge,nameI,rs,pu,xs,xl});
+});
 
-      setBanner(
-        'ok',
-        'Auto-discovery — wybór urządzeń',
-        'Zaznacz pozycje które chcesz wystawić do HomeKit, popraw nazwy wyświetlane w HomeKit i wybierz typy. Wyjścia o tej samej nazwie w centrali pojawiają się osobno jako „Rolety".',
-      );
-      const stamp = document.createElement('div');
-      stamp.className = 'stamp';
-      stamp.textContent = 'Ostatni skan: ' + (discovery.discoveredAt || 'nieznany');
-      app.appendChild(stamp);
+// SAVE
+const act=document.createElement('div');act.className='actions';
+const save=document.createElement('button');save.className='p';save.textContent='Zapisz wybrane do konfiguracji';act.appendChild(save);
+const saveMsg=document.createElement('span');saveMsg.className='muted';act.appendChild(saveMsg);
+app.appendChild(act);
+save.onclick=async()=>{
+  save.disabled=true;saveMsg.textContent='Zapisywanie…';
+  const partitions=pItems.filter(r=>r.cb.checked).map(r=>({
+    id:r.d.id,name:(r.nameI.value||r.d.name).trim(),
+    armHomeMode:+r.home.value,armNightMode:+r.night.value,
+    homekitModes:r.modes.get()
+  }));
+  const zones=zItems.filter(r=>r.cb.checked).map(r=>({
+    id:r.d.id,name:(r.nameI.value||r.d.name).trim(),
+    type:r.ts.value,invert:(r.x&&r.x.invert)||false
+  }));
+  const shutters=shItems.filter(r=>r.cb.checked).map(r=>({
+    name:(r.nameI.value||'').trim()||('Roleta '+r.up.textContent),
+    outputUp:+r.up.textContent,outputDown:+r.dn.textContent,
+    travelUpSec:+r.tU.value,travelDownSec:+r.tD.value,
+    extraPulseSec:+r.ex.value,pulseMs:+r.pu.value
+  }));
+  const switches=[],locks=[];
+  oItems.forEach(r=>{
+    if(!r.cb.checked)return;
+    const n=(r.nameI.value||r.d.name).trim();
+    if(r.rs.value==='lock')locks.push({name:n,output:r.d.id,pulseMs:+r.pu.value||1500});
+    else if(r.rs.value==='switch-pulse')switches.push({name:n,output:r.d.id,mode:'pulse',pulseMs:+r.pu.value||500});
+    else switches.push({name:n,output:r.d.id,mode:'toggle',pulseMs:+r.pu.value||500});
+  });
+  const next={...C,partitions,zones,shutters,switches,locks,temperatures:C.temperatures||[]};
+  if(!next.platform)next.platform='SatelIntegra';
+  try{
+    await homebridge.updatePluginConfig([next]);
+    await homebridge.savePluginConfig();
+    saveMsg.textContent='Zapisano. Homebridge zrestartuje platformę.';
+    refreshBadges();
+  }catch(e){saveMsg.textContent='Błąd zapisu: '+msg(e)}
+  finally{save.disabled=false}
+};
+homebridge.showSchemaForm();
 
-      const existingPartitions = new Map((cfg.partitions || []).map((p) => [p.id, p]));
-      const existingZones = new Map((cfg.zones || []).map((z) => [z.id, z]));
-      const existingSwitches = new Map((cfg.switches || []).map((s) => [s.output, s]));
-      const existingLocks = new Map((cfg.locks || []).map((l) => [l.output, l]));
-      const existingShutters = cfg.shutters || [];
-
-      //
-      // PARTITIONS
-      //
-      const partRows = renderTable({
-        title: 'Partycje (strefy)',
-        headers: ['', 'Id', 'Nazwa w HomeKit', 'Tryb „Home"', 'Tryb „Night"', 'Widoczne w HomeKit', 'Status'],
-        devices: discovery.partitions,
-        rowSpec: (d) => {
-          const existing = existingPartitions.get(d.id);
-          const nameInput = buildText((existing && existing.name) || d.name, d.name);
-          const home = buildSelect(ARM_MODES, (existing && existing.armHomeMode) ?? 2);
-          const night = buildSelect(ARM_MODES, (existing && existing.armNightMode) ?? 3);
-          const modes = buildHkModes((existing && existing.homekitModes) || ['off', 'home', 'night', 'away']);
-          return {
-            checked: !!existing,
-            cells: [
-              { text: d.id, cls: 'id' },
-              { el: nameInput.wrap, cls: 'name-cell' },
-              { el: home },
-              { el: night },
-              { el: modes.wrap },
-              { el: statusBadge(!!existing) },
-            ],
-            data: { nameInput: nameInput.input, home, night, modes, existing },
-          };
-        },
-      });
-
-      //
-      // ZONES
-      //
-      const zoneRows = renderTable({
-        title: 'Wejścia (czujki)',
-        headers: ['', 'Id', 'Nazwa w HomeKit', 'Typ HomeKit', 'Status'],
-        devices: discovery.zones,
-        rowSpec: (d) => {
-          const existing = existingZones.get(d.id);
-          const nameInput = buildText((existing && existing.name) || d.name, d.name);
-          const typeSel = buildSelect(ZONE_TYPES, (existing && existing.type) || 'motion');
-          return {
-            checked: !!existing,
-            cells: [
-              { text: d.id, cls: 'id' },
-              { el: nameInput.wrap, cls: 'name-cell' },
-              { el: typeSel },
-              { el: statusBadge(!!existing) },
-            ],
-            data: { nameInput: nameInput.input, typeSel, existing },
-          };
-        },
-      });
-
-      //
-      // SHUTTERS
-      //
-      const shutterRows = buildShutterRows(discovery.outputs, existingShutters);
-      const shutterUsedIds = new Set();
-      for (const sr of shutterRows) {
-        shutterUsedIds.add(sr.outputUp);
-        shutterUsedIds.add(sr.outputDown);
-      }
-      const shutterUi = renderShutterTable(shutterRows);
-
-      //
-      // SINGLE OUTPUTS
-      //
-      const singleOutputs = discovery.outputs.filter((o) => !shutterUsedIds.has(o.id));
-      const outRows = renderTable({
-        title: 'Wyjścia pojedyncze (switch / lock)',
-        headers: ['', 'Id', 'Nazwa w HomeKit', 'Rola', 'Impuls [ms]', 'Status'],
-        devices: singleOutputs,
-        rowSpec: (d) => {
-          const existingSwitch = existingSwitches.get(d.id);
-          const existingLock = existingLocks.get(d.id);
-          let preset = 'switch-toggle';
-          let defaultPulseMs = 500;
-          let hkName = d.name;
-          if (existingLock) {
-            preset = 'lock';
-            defaultPulseMs = existingLock.pulseMs || 1500;
-            hkName = existingLock.name || d.name;
-          } else if (existingSwitch) {
-            preset = existingSwitch.mode === 'pulse' ? 'switch-pulse' : 'switch-toggle';
-            defaultPulseMs = existingSwitch.pulseMs || 500;
-            hkName = existingSwitch.name || d.name;
-          }
-          const nameInput = buildText(hkName, d.name);
-          const roleSel = buildSelect(OUTPUT_ROLES, preset);
-          const pulseInput = buildNumber(defaultPulseMs, { min: 50, max: 10000, step: 50 });
-          const updatePulseEnabled = () => {
-            pulseInput.disabled = roleSel.value === 'switch-toggle';
-            if (pulseInput.disabled && !pulseInput.value) pulseInput.value = '500';
-          };
-          roleSel.addEventListener('change', updatePulseEnabled);
-          updatePulseEnabled();
-          return {
-            checked: !!(existingSwitch || existingLock),
-            cells: [
-              { text: d.id, cls: 'id' },
-              { el: nameInput.wrap, cls: 'name-cell' },
-              { el: roleSel },
-              { el: pulseInput, cls: 'num' },
-              { el: statusBadge(!!(existingSwitch || existingLock)) },
-            ],
-            data: { nameInput: nameInput.input, roleSel, pulseInput, existingSwitch, existingLock },
-          };
-        },
-      });
-
-      //
-      // SAVE
-      //
-      const actions = document.createElement('div');
-      actions.className = 'actions';
-      const saveBtn = document.createElement('button');
-      saveBtn.className = 'primary';
-      saveBtn.textContent = 'Zapisz wybrane do konfiguracji';
-      actions.appendChild(saveBtn);
-      const msg = document.createElement('span');
-      msg.className = 'muted';
-      actions.appendChild(msg);
-      app.appendChild(actions);
-
-      saveBtn.onclick = async () => {
-        saveBtn.disabled = true;
-        msg.textContent = 'Zapisywanie…';
-
-        const partitions = partRows.rows
-          .filter((r) => r.cb.checked)
-          .map((r) => ({
-            id: r.device.id,
-            name: (r.data.nameInput.value || r.device.name).trim(),
-            armHomeMode: Number(r.data.home.value),
-            armNightMode: Number(r.data.night.value),
-            homekitModes: r.data.modes.getValues(),
-          }));
-
-        const zones = zoneRows.rows
-          .filter((r) => r.cb.checked)
-          .map((r) => ({
-            id: r.device.id,
-            name: (r.data.nameInput.value || r.device.name).trim(),
-            type: r.data.typeSel.value,
-            invert: (r.data.existing && r.data.existing.invert) || false,
-          }));
-
-        const shutters = shutterUi
-          .filter((r) => r.cb.checked)
-          .map((r) => ({
-            name: (r.nameInput.value || '').trim() || ('Roleta ' + r.outputUpCell.textContent),
-            outputUp: Number(r.outputUpCell.textContent),
-            outputDown: Number(r.outputDownCell.textContent),
-            travelUpSec: Number(r.travelUp.value),
-            travelDownSec: Number(r.travelDown.value),
-            extraPulseSec: Number(r.extra.value),
-            pulseMs: Number(r.pulse.value),
-          }));
-
-        const switches = [];
-        const locks = [];
-        for (const r of outRows.rows) {
-          if (!r.cb.checked) continue;
-          const d = r.device;
-          const role = r.data.roleSel.value;
-          const name = (r.data.nameInput.value || d.name).trim();
-          if (role === 'lock') {
-            locks.push({ name, output: d.id, pulseMs: Number(r.data.pulseInput.value) || 1500 });
-          } else if (role === 'switch-pulse') {
-            switches.push({ name, output: d.id, mode: 'pulse', pulseMs: Number(r.data.pulseInput.value) || 500 });
-          } else {
-            switches.push({ name, output: d.id, mode: 'toggle', pulseMs: Number(r.data.pulseInput.value) || 500 });
-          }
-        }
-
-        const next = { ...cfg, partitions, zones, shutters, switches, locks };
-        next.temperatures = cfg.temperatures || [];
-        if (!next.platform) next.platform = 'SatelIntegra';
-
-        try {
-          await homebridge.updatePluginConfig([next]);
-          await homebridge.savePluginConfig();
-          msg.textContent = 'Zapisano. Homebridge zrestartuje platformę.';
-          refreshStatusBadges();
-        } catch (e) {
-          msg.textContent = 'Błąd zapisu: ' + ((e && e.message) || String(e));
-        } finally {
-          saveBtn.disabled = false;
-        }
-      };
-
-      homebridge.showSchemaForm();
-
-      // ============= helpers =============
-
-      function renderTopBar() {
-        const bar = document.createElement('div');
-        bar.className = 'top-bar';
-
-        const rescanBtn = document.createElement('button');
-        rescanBtn.className = 'secondary';
-        rescanBtn.textContent = 'Wymuś ponowny skan z centrali';
-        const rescanMsg = document.createElement('span');
-        rescanMsg.className = 'muted';
-        bar.appendChild(rescanBtn);
-        bar.appendChild(rescanMsg);
-        app.appendChild(bar);
-
-        rescanBtn.onclick = async () => {
-          if (!confirm(
-            'To spowoduje:\n' +
-            '  1) usunięcie cache discovery,\n' +
-            '  2) restart Homebridge,\n' +
-            '  3) nowy skan centrali przy kolejnym starcie (~60 s).\n\n' +
-            'Kontynuować?',
-          )) return;
-          rescanBtn.disabled = true;
-          rescanMsg.textContent = 'Czyszczenie cache i restart Homebridge…';
-          try {
-            await homebridge.request('/rescan');
-            await homebridge.restartHomebridge();
-            rescanMsg.textContent = 'Homebridge się restartuje — odśwież stronę za minutę.';
-          } catch (e) {
-            rescanMsg.textContent = 'Błąd: ' + ((e && e.message) || String(e));
-            rescanBtn.disabled = false;
-          }
-        };
-      }
-
-      function setBanner(kind, title, html) {
-        statusBanner.className = 'banner' + (kind === 'warn' ? ' warn' : '');
-        statusBanner.innerHTML = '<h3>' + escapeHtml(title) + '</h3><p>' + html + '</p>';
-      }
-
-      function statusBadge(isConfigured) {
-        const span = document.createElement('span');
-        span.className = 'badge ' + (isConfigured ? 'ok' : 'warn');
-        span.textContent = isConfigured ? '✓ Skonfigurowane' : '— nieaktywne';
-        return span;
-      }
-
-      function buildSelect(options, value) {
-        const sel = document.createElement('select');
-        for (const o of options) {
-          const opt = document.createElement('option');
-          opt.value = String(o.value);
-          opt.textContent = o.label;
-          if (String(o.value) === String(value)) opt.selected = true;
-          sel.appendChild(opt);
-        }
-        return sel;
-      }
-
-      function buildNumber(value, { min = 0, max = 100000, step = 1 } = {}) {
-        const input = document.createElement('input');
-        input.type = 'number';
-        input.value = String(value);
-        input.min = String(min);
-        input.max = String(max);
-        input.step = String(step);
-        return input;
-      }
-
-      /** Editable name cell: input + muted "Satel: ..." hint below. */
-      function buildText(value, satelOriginal) {
-        const wrap = document.createElement('div');
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.value = value;
-        wrap.appendChild(input);
-        if (satelOriginal && satelOriginal !== value) {
-          const hint = document.createElement('span');
-          hint.className = 'satel-name';
-          hint.textContent = 'Satel: ' + satelOriginal;
-          wrap.appendChild(hint);
-        } else if (satelOriginal) {
-          const hint = document.createElement('span');
-          hint.className = 'satel-name';
-          hint.textContent = 'Satel: ' + satelOriginal;
-          wrap.appendChild(hint);
-        }
-        return { wrap, input };
-      }
-
-      function buildHkModes(selected) {
-        const wrap = document.createElement('div');
-        wrap.className = 'hk-modes';
-        const checkboxes = {};
-        for (const m of HK_MODES) {
-          const label = document.createElement('label');
-          const cb = document.createElement('input');
-          cb.type = 'checkbox';
-          cb.checked = selected.indexOf(m.value) !== -1;
-          checkboxes[m.value] = cb;
-          label.appendChild(cb);
-          label.appendChild(document.createTextNode(' ' + m.label));
-          wrap.appendChild(label);
-        }
-        return {
-          wrap,
-          getValues() {
-            const out = [];
-            for (const m of HK_MODES) {
-              if (checkboxes[m.value].checked) out.push(m.value);
-            }
-            return out;
-          },
-        };
-      }
-
-      function renderTable({ title, headers, devices, rowSpec }) {
-        const h = document.createElement('h2');
-        h.innerHTML = escapeHtml(title) + ' <span class="count">(' + devices.length + ')</span>';
-        app.appendChild(h);
-
-        if (devices.length === 0) {
-          const p = document.createElement('p');
-          p.className = 'muted';
-          p.textContent = 'Brak zeskanowanych pozycji.';
-          app.appendChild(p);
-          return { rows: [] };
-        }
-
-        const table = document.createElement('table');
-        const thead = document.createElement('thead');
-        const tr = document.createElement('tr');
-        for (const header of headers) {
-          const th = document.createElement('th');
-          th.textContent = header;
-          tr.appendChild(th);
-        }
-        thead.appendChild(tr);
-        table.appendChild(thead);
-
-        const tbody = document.createElement('tbody');
-        const rows = devices.map((device) => {
-          const spec = rowSpec(device);
-          const row = document.createElement('tr');
-
-          const cbTd = document.createElement('td');
-          cbTd.className = 'cb';
-          const cb = document.createElement('input');
-          cb.type = 'checkbox';
-          cb.checked = spec.checked;
-          cbTd.appendChild(cb);
-          row.appendChild(cbTd);
-
-          for (const c of spec.cells) {
-            const td = document.createElement('td');
-            if (c.cls) td.className = c.cls;
-            if (c.el) td.appendChild(c.el);
-            else td.textContent = String(c.text);
-            row.appendChild(td);
-          }
-          tbody.appendChild(row);
-          return { device, cb, row, data: spec.data };
-        });
-        table.appendChild(tbody);
-        app.appendChild(table);
-        return { rows };
-      }
-
-      function buildShutterRows(outputs, existingShutters) {
-        const byName = new Map();
-        for (const o of outputs) {
-          const key = (o.name || '').trim().toLowerCase();
-          if (!key) continue;
-          if (!byName.has(key)) byName.set(key, []);
-          byName.get(key).push(o);
-        }
-        const existingKey = new Set();
-        for (const s of existingShutters) {
-          existingKey.add(s.outputUp + ':' + s.outputDown);
-          existingKey.add(s.outputDown + ':' + s.outputUp);
-        }
-        const suggested = [];
-        for (const [, group] of byName) {
-          if (group.length !== 2) continue;
-          const [a, b] = group.sort((x, y) => x.id - y.id);
-          const key = a.id + ':' + b.id;
-          if (existingKey.has(key)) continue;
-          suggested.push({
-            name: a.name,
-            outputUp: a.id,
-            outputDown: b.id,
-            travelUpSec: 25,
-            travelDownSec: 25,
-            extraPulseSec: 2,
-            // 0 = bistable: plugin holds the output for the full travel time.
-            // >0 only if Satel has a shutter controller configured on the
-            // output and expects a short start/stop pulse.
-            pulseMs: 0,
-            _source: 'suggested',
-          });
-        }
-        const configured = existingShutters.map((s) => ({
-          name: s.name,
-          outputUp: s.outputUp,
-          outputDown: s.outputDown,
-          travelUpSec: s.travelUpSec || s.travelTimeSec || 25,
-          travelDownSec: s.travelDownSec || s.travelTimeSec || 25,
-          extraPulseSec: s.extraPulseSec != null ? s.extraPulseSec : 2,
-          pulseMs: s.pulseMs != null ? s.pulseMs : 500,
-          _source: 'configured',
-        }));
-        return configured.concat(suggested);
-      }
-
-      function renderShutterTable(shutterRows) {
-        const h = document.createElement('h2');
-        h.innerHTML = 'Rolety (para wyjść o tej samej nazwie) <span class="count">(' + shutterRows.length + ')</span>';
-        app.appendChild(h);
-
-        const hint = document.createElement('p');
-        hint.className = 'muted';
-        hint.innerHTML = 'Impuls: <b>0</b> (domyślnie) = wyjścia bistabilne — plugin sam trzyma wyjście przez czas otwarcia/zamknięcia. Wartość <b>>0</b> tylko jeśli w Satelu masz kontroler rolet sterowany krótkim impulsem (start/stop).';
-        app.appendChild(hint);
-
-        if (shutterRows.length === 0) {
-          const p = document.createElement('p');
-          p.className = 'muted';
-          p.textContent = 'Brak par wyjść o identycznych nazwach. Możesz dodać rolety ręcznie w formularzu poniżej.';
-          app.appendChild(p);
-          return [];
-        }
-
-        const table = document.createElement('table');
-        const thead = document.createElement('thead');
-        thead.innerHTML = '<tr>' +
-          '<th></th>' +
-          '<th>Nazwa w HomeKit</th>' +
-          '<th>Góra (id)</th>' +
-          '<th>Dół (id)</th>' +
-          '<th>↕</th>' +
-          '<th>Otwarcie [s]</th>' +
-          '<th>Zamknięcie [s]</th>' +
-          '<th>Ekstra [s]</th>' +
-          '<th title="0 = wyjście bistabilne (plugin steruje czasem). >0 tylko gdy w Satelu jest kontroler rolet na impuls.">Impuls [ms]</th>' +
-          '<th>Status</th>' +
-          '</tr>';
-        table.appendChild(thead);
-
-        const tbody = document.createElement('tbody');
-        const rendered = shutterRows.map((sr) => {
-          const row = document.createElement('tr');
-
-          const cbTd = document.createElement('td');
-          cbTd.className = 'cb';
-          const cb = document.createElement('input');
-          cb.type = 'checkbox';
-          cb.checked = sr._source === 'configured';
-          cbTd.appendChild(cb);
-          row.appendChild(cbTd);
-
-          const nameTd = document.createElement('td');
-          const nameInput = document.createElement('input');
-          nameInput.type = 'text';
-          nameInput.value = sr.name;
-          nameTd.appendChild(nameInput);
-          row.appendChild(nameTd);
-
-          const upTd = document.createElement('td');
-          upTd.className = 'id';
-          upTd.textContent = String(sr.outputUp);
-          row.appendChild(upTd);
-
-          const downTd = document.createElement('td');
-          downTd.className = 'id';
-          downTd.textContent = String(sr.outputDown);
-          row.appendChild(downTd);
-
-          const swapTd = document.createElement('td');
-          const swapBtn = document.createElement('button');
-          swapBtn.textContent = '↕';
-          swapBtn.title = 'Zamień: która strona jest „górą"';
-          swapBtn.onclick = () => {
-            const a = upTd.textContent;
-            upTd.textContent = downTd.textContent;
-            downTd.textContent = a;
-          };
-          swapTd.appendChild(swapBtn);
-          row.appendChild(swapTd);
-
-          const travelUp = buildNumber(sr.travelUpSec, { min: 1, max: 600 });
-          const travelDown = buildNumber(sr.travelDownSec, { min: 1, max: 600 });
-          const extra = buildNumber(sr.extraPulseSec, { min: 0, max: 30 });
-          const pulse = buildNumber(sr.pulseMs, { min: 0, max: 10000, step: 50 });
-
-          for (const el of [travelUp, travelDown, extra, pulse]) {
-            const td = document.createElement('td');
-            td.className = 'num';
-            td.appendChild(el);
-            row.appendChild(td);
-          }
-
-          const statusTd = document.createElement('td');
-          statusTd.className = 'status';
-          statusTd.appendChild(statusBadge(sr._source === 'configured'));
-          row.appendChild(statusTd);
-
-          tbody.appendChild(row);
-          return {
-            cb, row,
-            nameInput, outputUpCell: upTd, outputDownCell: downTd,
-            travelUp, travelDown, extra, pulse,
-            statusTd,
-          };
-        });
-        table.appendChild(tbody);
-        app.appendChild(table);
-        return rendered;
-      }
-
-      function refreshStatusBadges() {
-        const all = [
-          ...partRows.rows.map((r) => ({ cb: r.cb, row: r.row })),
-          ...zoneRows.rows.map((r) => ({ cb: r.cb, row: r.row })),
-          ...outRows.rows.map((r) => ({ cb: r.cb, row: r.row })),
-        ];
-        for (const entry of all) {
-          const badgeCell = entry.row.lastElementChild;
-          if (!badgeCell) continue;
-          badgeCell.innerHTML = '';
-          badgeCell.appendChild(statusBadge(entry.cb.checked));
-        }
-        for (const sr of shutterUi) {
-          sr.statusTd.innerHTML = '';
-          sr.statusTd.appendChild(statusBadge(sr.cb.checked));
-        }
-      }
-
-      function escapeHtml(s) {
-        return String(s).replace(/[&<>"']/g, (c) => (
-          { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
-        ));
-      }
-    })();
-  </script>
+// helpers
+function topBar(){
+  const bar=document.createElement('div');bar.className='topbar';
+  const b=document.createElement('button');b.className='s';b.textContent='Wymuś ponowny skan z centrali';
+  const m=document.createElement('span');m.className='muted';
+  bar.appendChild(b);bar.appendChild(m);app.appendChild(bar);
+  b.onclick=async()=>{
+    if(!confirm('Usunąć cache i zrestartować Homebridge? Nowy skan zajmie ~60 s.'))return;
+    b.disabled=true;m.textContent='Czyszczenie cache + restart…';
+    try{await homebridge.request('/rescan');await homebridge.restartHomebridge();m.textContent='Homebridge się restartuje — odśwież za minutę.'}
+    catch(e){m.textContent='Błąd: '+msg(e);b.disabled=false}
+  };
+}
+function setB(k,t,h){sBanner.className='banner'+(k==='warn'?' warn':'');sBanner.innerHTML='<h3>'+esc(t)+'</h3><p>'+h+'</p>'}
+function section(t,n){const h=document.createElement('h2');h.innerHTML=esc(t)+' <span class="count">('+n+')</span>';app.appendChild(h)}
+function mkCard(id,satelName,on){
+  const card=document.createElement('div');card.className='card'+(on?' on':'');
+  const head=document.createElement('div');head.className='card-head';
+  const cb=document.createElement('input');cb.type='checkbox';cb.checked=on;head.appendChild(cb);
+  const idEl=document.createElement('span');idEl.className='id';idEl.textContent='#'+id;head.appendChild(idEl);
+  const t=document.createElement('span');t.className='title';t.textContent=satelName;head.appendChild(t);
+  const b=statusBadge(on);head.appendChild(b);
+  cb.addEventListener('change',()=>{card.classList.toggle('on',cb.checked);b.replaceWith(statusBadge(cb.checked))});
+  card.appendChild(head);app.appendChild(card);
+  return {card,cb,badge:b};
+}
+function body(fields){const b=document.createElement('div');b.className='card-body';fields.forEach(f=>b.appendChild(f));return b}
+function field(label,el,hint){
+  const d=document.createElement('div');d.className='f';
+  const l=document.createElement('label');l.textContent=label;d.appendChild(l);
+  d.appendChild(el);
+  if(hint&&(!el.value||el.value!==hint)){const h=document.createElement('span');h.className='hint';h.textContent='Satel: '+hint;d.appendChild(h)}
+  return d;
+}
+function inp(type,val,attrs){const i=document.createElement('input');i.type=type;i.value=val==null?'':String(val);if(attrs){if(attrs.min!=null)i.min=attrs.min;if(attrs.max!=null)i.max=attrs.max;if(attrs.step!=null)i.step=attrs.step}return i}
+function sel(opts,val){const s=document.createElement('select');opts.forEach(([v,l])=>{const o=document.createElement('option');o.value=String(v);o.textContent=l;if(String(v)===String(val))o.selected=true;s.appendChild(o)});return s}
+function hkModes(selected){
+  const el=document.createElement('div');el.className='hkm';const cbs={};
+  HK.forEach(([v,l])=>{const lab=document.createElement('label');const c=document.createElement('input');c.type='checkbox';c.checked=selected.indexOf(v)!==-1;cbs[v]=c;lab.appendChild(c);lab.appendChild(document.createTextNode(' '+l));el.appendChild(lab)});
+  return {el,get:()=>HK.filter(([v])=>cbs[v].checked).map(([v])=>v)};
+}
+function numCell(v){const s=document.createElement('span');s.className='id';s.textContent=String(v);return s}
+function statusBadge(on){const s=document.createElement('span');s.className='badge '+(on?'ok':'warn');s.textContent=on?'✓ Skonfigurowane':'— nieaktywne';return s}
+function buildShutters(outs,existing){
+  const byName=new Map();outs.forEach(o=>{const k=(o.name||'').trim().toLowerCase();if(!k)return;(byName.get(k)||byName.set(k,[]).get(k)).push(o)});
+  const keyset=new Set();existing.forEach(s=>{keyset.add(s.outputUp+':'+s.outputDown);keyset.add(s.outputDown+':'+s.outputUp)});
+  const sug=[];byName.forEach(g=>{if(g.length!==2)return;const [a,b]=g.sort((x,y)=>x.id-y.id);if(keyset.has(a.id+':'+b.id))return;sug.push({name:a.name,outputUp:a.id,outputDown:b.id,travelUpSec:25,travelDownSec:25,extraPulseSec:2,pulseMs:0,_src:'sug'})});
+  const cfg=existing.map(s=>({name:s.name,outputUp:s.outputUp,outputDown:s.outputDown,travelUpSec:s.travelUpSec||s.travelTimeSec||25,travelDownSec:s.travelDownSec||s.travelTimeSec||25,extraPulseSec:s.extraPulseSec!=null?s.extraPulseSec:2,pulseMs:s.pulseMs!=null?s.pulseMs:0,_src:'cfg'}));
+  return cfg.concat(sug);
+}
+function refreshBadges(){
+  [...pItems,...zItems,...oItems].forEach(r=>{const nb=statusBadge(r.cb.checked);r.badge.replaceWith(nb);r.badge=nb});
+  shItems.forEach(r=>{/* shutter badges handled via change listener */});
+}
+function msg(e){return(e&&e.message)||String(e)}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+})();
+</script>
 </body>
 </html>
