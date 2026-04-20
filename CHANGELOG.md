@@ -4,6 +4,13 @@ All notable changes to this project are documented here. Format roughly follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and versions use
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.1] — 2026-04-20
+
+First stable release on the `latest` tag. Identical runtime behaviour to
+`0.6.0-beta.0` after a round of real-hardware testing — the only changes
+are a README Quick start section and an updated Installation sources
+table that points at the npm package instead of a GitHub branch.
+
 ## [0.6.0-beta.0] — 2026-04-20
 
 First public pre-release. Tagged `beta` on npm: install with
@@ -57,4 +64,5 @@ First public pre-release. Tagged `beta` on npm: install with
   `satel-integra-integration-protocol` library does not yet expose the
   relevant commands. Will return once it does.
 
+[0.6.1]: https://github.com/artRybka/homebridge-satel/releases/tag/v0.6.1
 [0.6.0-beta.0]: https://github.com/artRybka/homebridge-satel/releases/tag/v0.6.0-beta.0

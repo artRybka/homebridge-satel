@@ -17,25 +17,50 @@ Configuration is driven from a **Custom UI in Homebridge Config UI X**: the plug
 
 There is no upper bound besides the central unit size (Integra 24/32/64/128/256). The protocol width (128 vs 256) is auto-selected from the highest configured id.
 
-## Installation
+## Quick start
 
-Install the latest pre-release directly from GitHub:
+**Before you begin**: log in to your Satel central (via DLOADX or the keypad) and create a dedicated integration user with a 4–8 digit code, granting it only the rights you want HomeKit to have (arm/disarm specific partitions, toggle specific outputs). Don't use your personal master code. Make sure no other system (Domoticz, Home Assistant, …) is holding the single TCP slot on the ETHM.
 
-```bash
-cd ~/.homebridge     # or /var/lib/homebridge for hb-service
-npm install github:artRybka/homebridge-satel#claude/add-claude-documentation-Gm4dP
-sudo hb-service restart
-```
+1. **Install the plugin**.
+   - Via Homebridge Config UI X: *Plugins* tab → *Install Plugin* (cloud+plus icon top-right) → search for `homebridge-satel-integra` → Install.
+   - Or from the shell, in your Homebridge storage directory:
+     ```bash
+     cd ~/.homebridge     # or /var/lib/homebridge for hb-service
+     npm install homebridge-satel-integra
+     sudo hb-service restart
+     ```
 
-The repo ships a `prepare` hook, so the TypeScript build runs automatically during `npm install`.
+2. **Enter connection details**. Open the plugin's *Settings* page. Fill in:
+   - **Adres IP modułu ETHM** — e.g. `192.168.1.50`.
+   - **Port TCP** — default `7094`.
+   - **Kod użytkownika Satel** — the 4–8 digit code of the integration user you created.
+   - Leave *Interwał odpytywania* at `1000` ms.
+   Save. Homebridge restarts and the plugin connects to the central.
 
-Once published on npm it will be:
+3. **Pull data from the central**. Back in *Settings*, click **„Pobierz dane z Centrali"**. The plugin queries ~300 entities by name; takes 30–60 s. When it's done Homebridge restarts once more and the picker reloads with three sections: Partycje, Wejścia, Rolety, Wyjścia pojedyncze.
 
-```bash
-npm install -g homebridge-satel-integra
-```
+4. **Pick what you want in HomeKit**. Each card is collapsed by default. Click the card to expand and tick. For every entity you enable:
+   - **Nazwa w HomeKit** — how the accessory appears in the Home app (pre-filled with the Satel label, edit freely).
+   - **Partycje** → choose *Tryb Home* and *Tryb Night* (which Satel arm mode each HomeKit mode triggers), and optionally hide modes you don't use in *Widoczne w HomeKit*.
+   - **Wejścia** → pick *Typ HomeKit* (motion / contact / smoke / leak / CO / occupancy). Tick *Odwróć logikę* only for NC zones where spoczynek = naruszenie.
+   - **Rolety** → the plugin auto-pairs outputs that share a name. Set *Otwarcie [s]*, *Zamknięcie [s]*, *Ekstra [s]* (endpoint hold) and *Impuls [ms]* (0 = bistable outputs, >0 = Satel shutter controller). Use ↕ if the plugin picked the wrong side as "Góra".
+   - **Wyjścia pojedyncze** → choose *Rola* (bistable switch / pulse switch / electric strike) and the pulse length where applicable.
 
-## Configuration — Custom UI
+5. **Save** via the sticky green button at the bottom. Homebridge restarts one final time and the selected accessories appear in the Apple Home app.
+
+After any change on the Satel side (renaming, adding, removing an entity), come back to *Settings* and click „Pobierz dane z Centrali" to refresh the picker.
+
+## Installation sources
+
+| Source | Command | When to use |
+|---|---|---|
+| npm (stable, recommended) | `npm install homebridge-satel-integra` | Default for production installs. |
+| npm (pre-release) | `npm install homebridge-satel-integra@beta` | Early access to upcoming versions. |
+| GitHub `main` branch | `npm install github:artRybka/homebridge-satel` | Bleeding edge, may be unstable. |
+
+The repo ships a `prepare` hook so builds run automatically for source installs.
+
+## Configuration reference
 
 Open the plugin's **Settings** page in Config UI X. You get a dedicated picker (not the usual schema form):
 
@@ -52,17 +77,6 @@ Per-section controls:
 - **Wejścia** — HomeKit name, Typ HomeKit (motion / contact / smoke / leak / CO / occupancy), Odwróć logikę (for NC sensors where naruszenie = spoczynek).
 - **Rolety** — auto-paired outputs sharing the same Satel name (e.g. 17 and 18 named "Kitchen"). Per-shutter: HomeKit name, swap ↕, Otwarcie [s], Zamknięcie [s], Ekstra [s] (dociśnięcie przy 0 % / 100 %), Impuls [ms] (0 for bistable, >0 for a Satel shutter controller).
 - **Wyjścia pojedyncze** — rola (Przełącznik bistabilny / impulsowy / Elektrozaczep) + Impuls [ms] where applicable.
-
-### First-run flow
-
-1. Install + restart. Plugin connects to ETHM, finds no discovery cache → scans and saves the result.
-2. Open plugin **Settings** in Config UI X. Picker shows everything the central unit has named.
-3. Tick what you want in HomeKit, correct names/types.
-4. Save. Homebridge restarts, accessories appear in the Home app.
-
-### Re-scan
-
-Click **„Pobierz dane z Centrali"** whenever you add, rename or remove entities on the central unit. It clears the cache and restarts Homebridge; the next boot does a fresh scan.
 
 ## Partition arm modes
 
