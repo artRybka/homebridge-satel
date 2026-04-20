@@ -66,7 +66,7 @@ topBar();
 let disc;
 try{disc=await homebridge.request('/discovery')}catch(e){setB('warn','Błąd',msg(e));homebridge.showSchemaForm();return}
 const [cfg]=(await homebridge.getPluginConfig());const C=cfg||{};
-if(!disc.available){setB('warn','Brak zeskanowanych danych','Kliknij „Pobierz dane z Centrali Satel Integra" powyżej — plugin wczyta nazwy partycji, wejść i wyjść z centrali i wróci tu z listą.');homebridge.showSchemaForm();return}
+if(!disc.available){setB('warn','Brak zeskanowanych danych','Kliknij „Pobierz dane z Centrali" powyżej — plugin wczyta nazwy partycji, wejść i wyjść z centrali i wróci tu z listą.');homebridge.showSchemaForm();return}
 setB('ok','Auto-discovery','Zaznacz urządzenia do wystawienia w HomeKit, popraw nazwy i typy. Pary wyjść o tej samej nazwie pojawiają się jako „Rolety".');
 const st=document.createElement('div');st.className='stamp';st.textContent='Ostatni skan: '+(disc.discoveredAt||'—');app.appendChild(st);
 
@@ -102,12 +102,14 @@ disc.zones.forEach(d=>{
   const x=eZ.get(d.id);
   const nameI=inp('text',(x&&x.name)||d.name);
   const ts=sel(ZT,(x&&x.type)||'motion');
+  const inv=cbField('Logika wejścia','Odwrócona (NC)',(x&&x.invert)||false);
   const {card,cb,badge}=mkCard(d.id,d.name,!!x);
   card.appendChild(body([
     field('Nazwa w HomeKit',nameI,d.name),
     field('Typ HomeKit',ts),
+    inv.el,
   ]));
-  zItems.push({d,cb,badge,nameI,ts,x});
+  zItems.push({d,cb,badge,nameI,ts,invert:inv.cb,x});
 });
 
 // SHUTTERS
@@ -189,7 +191,7 @@ save.onclick=async()=>{
   }));
   const zones=zItems.filter(r=>r.cb.checked).map(r=>({
     id:r.d.id,name:(r.nameI.value||r.d.name).trim(),
-    type:r.ts.value,invert:(r.x&&r.x.invert)||false
+    type:r.ts.value,invert:r.invert.checked
   }));
   const shutters=shItems.filter(r=>r.cb.checked).map(r=>({
     name:(r.nameI.value||'').trim()||('Roleta '+r.up.textContent),
@@ -205,7 +207,7 @@ save.onclick=async()=>{
     else if(r.rs.value==='switch-pulse')switches.push({name:n,output:r.d.id,mode:'pulse',pulseMs:+r.pu.value||500});
     else switches.push({name:n,output:r.d.id,mode:'toggle',pulseMs:+r.pu.value||500});
   });
-  const next={...C,partitions,zones,shutters,switches,locks,temperatures:C.temperatures||[]};
+  const next={...C,partitions,zones,shutters,switches,locks};delete next.temperatures;
   if(!next.platform)next.platform='SatelIntegra';
   try{
     await homebridge.updatePluginConfig([next]);
@@ -220,7 +222,7 @@ homebridge.showSchemaForm();
 // helpers
 function topBar(){
   const bar=document.createElement('div');bar.className='topbar';
-  const b=document.createElement('button');b.className='s';b.textContent='Pobierz dane z Centrali Satel Integra';
+  const b=document.createElement('button');b.className='s';b.textContent='Pobierz dane z Centrali';
   const m=document.createElement('span');m.className='muted';
   bar.appendChild(b);bar.appendChild(m);app.appendChild(bar);
   b.onclick=async()=>{
@@ -253,6 +255,15 @@ function field(label,el,hint){
   d.appendChild(el);
   if(hint&&(!el.value||el.value!==hint)){const h=document.createElement('span');h.className='hint';h.textContent='Satel: '+hint;d.appendChild(h)}
   return d;
+}
+function cbField(label,helper,checked){
+  const d=document.createElement('div');d.className='f';
+  const l=document.createElement('label');l.textContent=label;d.appendChild(l);
+  const wrap=document.createElement('label');wrap.style.display='inline-flex';wrap.style.gap='6px';wrap.style.alignItems='center';wrap.style.height='32px';wrap.style.cursor='pointer';wrap.style.userSelect='none';
+  const cb=document.createElement('input');cb.type='checkbox';cb.checked=!!checked;wrap.appendChild(cb);
+  const t=document.createElement('span');t.style.fontSize='13px';t.textContent=helper;wrap.appendChild(t);
+  d.appendChild(wrap);
+  return {el:d,cb};
 }
 function inp(type,val,attrs){const i=document.createElement('input');i.type=type;i.value=val==null?'':String(val);if(attrs){if(attrs.min!=null)i.min=attrs.min;if(attrs.max!=null)i.max=attrs.max;if(attrs.step!=null)i.step=attrs.step}return i}
 function sel(opts,val){const s=document.createElement('select');opts.forEach(([v,l])=>{const o=document.createElement('option');o.value=String(v);o.textContent=l;if(String(v)===String(val))o.selected=true;s.appendChild(o)});return s}

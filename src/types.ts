@@ -57,11 +57,6 @@ export interface LockConfig {
   pulseMs: number;
 }
 
-export interface TemperatureConfig {
-  name: string;
-  output: number;
-}
-
 export interface SatelPlatformConfig extends PlatformConfig {
   host: string;
   port: number;
@@ -74,5 +69,4 @@ export interface SatelPlatformConfig extends PlatformConfig {
   shutters: ShutterConfig[];
   switches: SwitchConfig[];
   locks: LockConfig[];
-  temperatures: TemperatureConfig[];
 }

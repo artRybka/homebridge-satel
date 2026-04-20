@@ -11,7 +11,6 @@ import type {
   SatelPlatformConfig,
   ShutterConfig,
   SwitchConfig,
-  TemperatureConfig,
   ZoneConfig,
   ZoneSensorType,
 } from './types';
@@ -53,13 +52,12 @@ export function parseConfig(raw: PlatformConfig, log: Logging): SatelPlatformCon
   const shutters = parseShutters(raw.shutters, log);
   const switches = parseSwitches(raw.switches, log);
   const locks = parseLocks(raw.locks, log);
-  const temperatures = parseTemperatures(raw.temperatures, log);
 
-  warnOnOutputConflicts({ shutters, switches, locks, temperatures }, log);
+  warnOnOutputConflicts({ shutters, switches, locks }, log);
 
   const total =
     partitions.length + zones.length + shutters.length +
-    switches.length + locks.length + temperatures.length;
+    switches.length + locks.length;
   if (total === 0) {
     log.warn('Plugin nie ma żadnych skonfigurowanych urządzeń.');
   }
@@ -79,7 +77,6 @@ export function parseConfig(raw: PlatformConfig, log: Logging): SatelPlatformCon
     shutters,
     switches,
     locks,
-    temperatures,
   };
 }
 
@@ -228,35 +225,11 @@ function parseLocks(raw: unknown, log: Logging): LockConfig[] {
   return out;
 }
 
-function parseTemperatures(raw: unknown, log: Logging): TemperatureConfig[] {
-  if (!Array.isArray(raw)) {
-    return [];
-  }
-  const seen = new Set<number>();
-  const out: TemperatureConfig[] = [];
-  for (const entry of raw) {
-    const name = asString(entry?.name, 'temperature.name');
-    const output = asInt(entry?.output, 'temperature.output', NaN, 1, 256);
-    if (!name || !Number.isFinite(output)) {
-      log.error('Pominięto nieprawidłowy wpis w "temperatures": %j', entry);
-      continue;
-    }
-    if (seen.has(output)) {
-      log.error('Zduplikowane wyjście czujnika temperatury %d — pomijam.', output);
-      continue;
-    }
-    seen.add(output);
-    out.push({ name, output });
-  }
-  return out;
-}
-
 function warnOnOutputConflicts(
   cfg: {
     shutters: ShutterConfig[];
     switches: SwitchConfig[];
     locks: LockConfig[];
-    temperatures: TemperatureConfig[];
   },
   log: Logging,
 ): void {
@@ -272,7 +245,6 @@ function warnOnOutputConflicts(
   }
   for (const s of cfg.switches) add(s.output, `switch "${s.name}"`);
   for (const l of cfg.locks) add(l.output, `lock "${l.name}"`);
-  for (const t of cfg.temperatures) add(t.output, `temperature "${t.name}"`);
 
   for (const [output, labels] of byOutput) {
     if (labels.length > 1) {

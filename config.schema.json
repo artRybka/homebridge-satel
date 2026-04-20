@@ -255,28 +255,6 @@
             }
           }
         }
-      },
-      "temperatures": {
-        "title": "Czujniki temperatury (opcjonalnie)",
-        "type": "array",
-        "description": "Wymaga wyjścia typu 'temperatura' w konfiguracji Satela.",
-        "items": {
-          "type": "object",
-          "properties": {
-            "name": {
-              "title": "Nazwa",
-              "type": "string",
-              "required": true
-            },
-            "output": {
-              "title": "Numer wyjścia temperaturowego",
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 256,
-              "required": true
-            }
-          }
-        }
       }
     },
     "required": ["name", "host", "userCode"]

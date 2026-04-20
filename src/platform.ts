@@ -19,7 +19,6 @@ import { LockAccessory } from './accessories/lockAccessory';
 import { PartitionAccessory } from './accessories/partitionAccessory';
 import { ShutterAccessory } from './accessories/shutterAccessory';
 import { SwitchAccessory } from './accessories/switchAccessory';
-import { TemperatureAccessory } from './accessories/temperatureAccessory';
 import { ZoneAccessory } from './accessories/zoneAccessory';
 import type { SatelPlatformConfig } from './types';
 
@@ -159,16 +158,6 @@ export class SatelPlatform implements DynamicPlatformPlugin {
       new ShutterAccessory(this, acc, sh);
     }
 
-    for (const t of cfg.temperatures) {
-      const acc = this.ensureAccessory(
-        `satel:temperature:${t.output}`,
-        t.name,
-        { temperature: t },
-      );
-      used.add(acc.UUID);
-      new TemperatureAccessory(this, acc, t);
-    }
-
     this.pruneStaleAccessories(used);
   }
 
@@ -259,13 +248,12 @@ export class SatelPlatform implements DynamicPlatformPlugin {
     for (const s of cfg.shutters) max = Math.max(max, s.outputUp, s.outputDown);
     for (const s of cfg.switches) max = Math.max(max, s.output);
     for (const l of cfg.locks) max = Math.max(max, l.output);
-    for (const t of cfg.temperatures) max = Math.max(max, t.output);
     return max;
   }
 
   private logConfigSummary(cfg: SatelPlatformConfig): void {
     this.log.info(
-      'Satel Integra: host=%s:%d, partycji=%d, wejść=%d, rolet=%d, przełączników=%d, zamków=%d, temp=%d, polling=%dms, szyfrowanie=%s',
+      'Satel Integra: host=%s:%d, partycji=%d, wejść=%d, rolet=%d, przełączników=%d, zamków=%d, polling=%dms, szyfrowanie=%s',
       cfg.host,
       cfg.port,
       cfg.partitions.length,
@@ -273,7 +261,6 @@ export class SatelPlatform implements DynamicPlatformPlugin {
       cfg.shutters.length,
       cfg.switches.length,
       cfg.locks.length,
-      cfg.temperatures.length,
       cfg.pollIntervalMs,
       cfg.integrationKey ? 'tak' : 'nie',
     );
