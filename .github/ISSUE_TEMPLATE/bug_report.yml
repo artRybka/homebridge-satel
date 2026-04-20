@@ -1,0 +1,61 @@
+name: Bug report
+description: Something doesn't work as expected
+labels: [bug]
+body:
+  - type: input
+    id: plugin-version
+    attributes:
+      label: Plugin version
+      placeholder: e.g. 0.6.0-beta.0
+    validations:
+      required: true
+  - type: input
+    id: homebridge-version
+    attributes:
+      label: Homebridge version
+      placeholder: e.g. 1.8.3
+    validations:
+      required: true
+  - type: input
+    id: node-version
+    attributes:
+      label: Node.js version
+      placeholder: e.g. 20.12.0
+  - type: input
+    id: central-model
+    attributes:
+      label: Satel central model + firmware
+      placeholder: e.g. Integra 64 with ETHM-1 Plus firmware 2.08
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: A clear, concise description of the problem.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. …
+        2. …
+        3. …
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log excerpt
+      description: Paste the lines around the failure. DO NOT paste your user code or integration key.
+      render: text
+  - type: textarea
+    id: config
+    attributes:
+      label: Plugin configuration (sanitized)
+      description: Redact `userCode` and `integrationKey` before pasting.
+      render: json

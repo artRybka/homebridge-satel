@@ -1,0 +1,60 @@
+# Changelog
+
+All notable changes to this project are documented here. Format roughly follows
+[Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and versions use
+[Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [0.6.0-beta.0] — 2026-04-20
+
+First public pre-release. Tagged `beta` on npm: install with
+`npm install homebridge-satel-integra@beta`.
+
+### Added
+
+- **HomeKit accessory types**: `SecuritySystem` (partitions), six flavors of
+  sensor (`MotionSensor`, `ContactSensor`, `SmokeSensor`, `LeakSensor`,
+  `CarbonMonoxideSensor`, `OccupancySensor`) for zones, `Switch` (bistable
+  or pulse), `LockMechanism` for electric strikes, `WindowCovering` for
+  shutters.
+- **Satel ETHM-1 / ETHM-1 Plus** TCP transport with auto-reconnect
+  (exponential backoff), serialized command queue, per-command timeout,
+  128/256-entity auto-selection.
+- **State poller** using `new_data` (0x7F) category bitmap, fetches only
+  changed categories; emits typed events consumed by accessories. First
+  tick after (re)connect does a full sync.
+- **Custom Config UI X interface** (`homebridge-ui/`):
+  - Discovery button reads partition / zone / output names from the
+    central unit via protocol command `0xEE`.
+  - Stacked cards with per-row HomeKit-name input, zone type dropdown,
+    NC invert checkbox, output role selector, shutter travel times.
+  - Auto-pairs outputs that share the same Satel name into "Rolety".
+  - Per-partition arm-mode mapping and a four-checkbox "Widoczne w
+    HomeKit" that restricts which modes appear in the Home app.
+  - Sticky save bar, collapsed unchecked cards (click header to toggle),
+    focus rings, aligned form controls.
+- **Shutter estimation**: per-direction `travelUpSec` / `travelDownSec`,
+  `extraPulseSec` hold at 0 % / 100 %, bistable (`pulseMs: 0`) or pulse
+  (`pulseMs > 0`) wiring modes.
+- **Shutter position persistence** every second during motion + on stop.
+  Direction-independent accessory UUID (`min:max`) so swapping up/down
+  in the UI doesn't orphan cached position.
+- **Alarm propagation**: `PartitionsAlarm` reads → accessory reports
+  `ALARM_TRIGGERED` in HomeKit. Disarm from HomeKit also clears a
+  latched alarm.
+- **Arm-mode collision fix**: when `armHomeMode == armNightMode`, the
+  partition accessory remembers the last HomeKit target so the Home app
+  no longer sits on "Arming…" forever.
+- **Forced rescan** button: wipes the discovery cache and restarts
+  Homebridge; next boot runs a fresh scan.
+
+### Known limitations
+
+- `integrationKey` (AES-192) is accepted but not implemented; connection
+  falls back to cleartext with a log warning.
+- Only one TCP client at a time on ETHM — disconnect Domoticz / HA / etc.
+  before running this plugin.
+- `temperatures` were removed: the upstream
+  `satel-integra-integration-protocol` library does not yet expose the
+  relevant commands. Will return once it does.
+
+[0.6.0-beta.0]: https://github.com/artRybka/homebridge-satel/releases/tag/v0.6.0-beta.0

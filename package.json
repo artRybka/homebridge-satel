@@ -14,6 +14,10 @@
   },
   "homepage": "https://github.com/artRybka/homebridge-satel#readme",
   "main": "dist/index.js",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "engines": {
     "node": "^20 || ^22",
     "homebridge": "^1.8.0 || ^2.0.0-beta.0"
