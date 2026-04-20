@@ -67,7 +67,7 @@ let disc;
 try{disc=await homebridge.request('/discovery')}catch(e){setB('warn','Błąd',msg(e));homebridge.showSchemaForm();return}
 const [cfg]=(await homebridge.getPluginConfig());const C=cfg||{};
 if(!disc.available){setB('warn','Brak zeskanowanych danych','Kliknij „Pobierz dane z Centrali" powyżej — plugin wczyta nazwy partycji, wejść i wyjść z centrali i wróci tu z listą.');homebridge.showSchemaForm();return}
-setB('ok','Auto-discovery','Zaznacz urządzenia do wystawienia w HomeKit, popraw nazwy i typy. Pary wyjść o tej samej nazwie pojawiają się jako „Rolety".');
+statusBanner.remove();
 const st=document.createElement('div');st.className='stamp';st.textContent='Ostatni skan: '+(disc.discoveredAt||'—');app.appendChild(st);
 
 const eP=new Map((C.partitions||[]).map(p=>[p.id,p]));
