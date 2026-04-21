@@ -1,7 +1,7 @@
 {
   "name": "homebridge-satel-integra",
   "displayName": "Satel Integra",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "Homebridge plugin for Satel Integra alarm system via ETHM-1 / ETHM-1 Plus.",
   "license": "MIT",
   "author": "artRybka",
@@ -19,7 +19,7 @@
     "provenance": true
   },
   "engines": {
-    "node": "^20 || ^22",
+    "node": "^20 || ^22 || ^24",
     "homebridge": "^1.8.0 || ^2.0.0-beta.0"
   },
   "scripts": {

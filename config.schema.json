@@ -7,24 +7,22 @@
   "footerDisplay": "Numery stref, wejść i wyjść sprawdzisz w programie **DLOADX** → *Struktura systemu*.",
   "schema": {
     "type": "object",
+    "required": ["name", "host", "port", "userCode"],
     "properties": {
       "name": {
         "title": "Nazwa platformy",
         "type": "string",
-        "default": "Satel Integra",
-        "required": true
+        "default": "Satel Integra"
       },
       "host": {
         "title": "Adres IP modułu ETHM",
         "type": "string",
-        "format": "ipv4",
-        "required": true
+        "format": "ipv4"
       },
       "port": {
         "title": "Port TCP",
         "type": "string",
         "default": "7094",
-        "required": true,
         "pattern": "^[0-9]{1,5}$",
         "description": "Numer portu TCP (1–65535). Domyślnie 7094."
       },
@@ -32,7 +30,6 @@
         "title": "Kod użytkownika Satel",
         "type": "string",
         "format": "password",
-        "required": true,
         "description": "Zalecane: utwórz w Satelu osobnego użytkownika z uprawnieniami tylko do potrzebnych stref i wyjść."
       },
       "integrationKey": {
@@ -57,18 +54,17 @@
         "type": "array",
         "items": {
           "type": "object",
+          "required": ["id", "name"],
           "properties": {
             "id": {
               "title": "Numer strefy w Satelu (1–32)",
               "type": "integer",
               "minimum": 1,
-              "maximum": 32,
-              "required": true
+              "maximum": 32
             },
             "name": {
               "title": "Nazwa w HomeKit",
-              "type": "string",
-              "required": true
+              "type": "string"
             },
             "armHomeMode": {
               "title": "Tryb 'Home' (Stay)",
@@ -100,23 +96,21 @@
         "type": "array",
         "items": {
           "type": "object",
+          "required": ["id", "name", "type"],
           "properties": {
             "id": {
               "title": "Numer wejścia w Satelu (1–256)",
               "type": "integer",
               "minimum": 1,
-              "maximum": 256,
-              "required": true
+              "maximum": 256
             },
             "name": {
               "title": "Nazwa w HomeKit",
-              "type": "string",
-              "required": true
+              "type": "string"
             },
             "type": {
               "title": "Typ czujnika w HomeKit",
               "type": "string",
-              "required": true,
               "default": "motion",
               "oneOf": [
                 { "title": "Ruch (MotionSensor)", "enum": ["motion"] },
@@ -141,25 +135,23 @@
         "type": "array",
         "items": {
           "type": "object",
+          "required": ["name", "outputUp", "outputDown"],
           "properties": {
             "name": {
               "title": "Nazwa",
-              "type": "string",
-              "required": true
+              "type": "string"
             },
             "outputUp": {
               "title": "Wyjście 'góra' (otwieranie)",
               "type": "integer",
               "minimum": 1,
-              "maximum": 256,
-              "required": true
+              "maximum": 256
             },
             "outputDown": {
               "title": "Wyjście 'dół' (zamykanie)",
               "type": "integer",
               "minimum": 1,
-              "maximum": 256,
-              "required": true
+              "maximum": 256
             },
             "travelUpSec": {
               "title": "Czas pełnego otwarcia (s)",
@@ -198,18 +190,17 @@
         "type": "array",
         "items": {
           "type": "object",
+          "required": ["name", "output"],
           "properties": {
             "name": {
               "title": "Nazwa",
-              "type": "string",
-              "required": true
+              "type": "string"
             },
             "output": {
               "title": "Numer wyjścia w Satelu",
               "type": "integer",
               "minimum": 1,
-              "maximum": 256,
-              "required": true
+              "maximum": 256
             },
             "mode": {
               "title": "Tryb działania",
@@ -234,18 +225,17 @@
         "type": "array",
         "items": {
           "type": "object",
+          "required": ["name", "output"],
           "properties": {
             "name": {
               "title": "Nazwa",
-              "type": "string",
-              "required": true
+              "type": "string"
             },
             "output": {
               "title": "Numer wyjścia w Satelu",
               "type": "integer",
               "minimum": 1,
-              "maximum": 256,
-              "required": true
+              "maximum": 256
             },
             "pulseMs": {
               "title": "Długość impulsu otwierającego (ms)",
@@ -256,8 +246,7 @@
           }
         }
       }
-    },
-    "required": ["name", "host", "userCode"]
+    }
   },
   "layout": [
     { "type": "flex", "flex-flow": "row wrap", "items": ["host", "port"] },

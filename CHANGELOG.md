@@ -4,6 +4,16 @@ All notable changes to this project are documented here. Format roughly follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and versions use
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.2] — 2026-04-20
+
+### Fixed
+
+- `package.json: engines.node` now includes Node 24 (`^20 || ^22 || ^24`)
+  so the plugin passes Homebridge Verified compatibility checks.
+- `config.schema.json`: `required: true` on individual fields replaced
+  with `required: [...]` arrays at the parent object level, matching
+  JSON Schema Draft 7 semantics. Fixes the Verified schema linter.
+
 ## [0.6.1] — 2026-04-20
 
 First stable release on the `latest` tag. Identical runtime behaviour to
@@ -64,5 +74,6 @@ First public pre-release. Tagged `beta` on npm: install with
   `satel-integra-integration-protocol` library does not yet expose the
   relevant commands. Will return once it does.
 
+[0.6.2]: https://github.com/artRybka/homebridge-satel/releases/tag/v0.6.2
 [0.6.1]: https://github.com/artRybka/homebridge-satel/releases/tag/v0.6.1
 [0.6.0-beta.0]: https://github.com/artRybka/homebridge-satel/releases/tag/v0.6.0-beta.0
