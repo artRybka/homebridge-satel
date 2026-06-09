@@ -4,6 +4,20 @@ All notable changes to this project are documented here. Format roughly follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and versions use
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.3] — 2026-04-20
+
+### Fixed
+
+- **Custom UI dark mode**: Config UI X in dark theme rendered my iframe
+  with the parent's dark background but my hardcoded dark text — making
+  almost everything invisible until you highlighted it. Replace fixed
+  colors with CSS variables driven by `@media (prefers-color-scheme:
+  dark)`; cards, banners, inputs, sticky save bar, badges, focus rings
+  all adapt now. No effect on light mode.
+
+  Reported with VERSA 15 + ETHM-1 Plus 03.13 — but it hit every dark-
+  mode user on every central.
+
 ## [0.6.2] — 2026-04-20
 
 ### Fixed
@@ -74,6 +88,7 @@ First public pre-release. Tagged `beta` on npm: install with
   `satel-integra-integration-protocol` library does not yet expose the
   relevant commands. Will return once it does.
 
+[0.6.3]: https://github.com/artRybka/homebridge-satel/releases/tag/v0.6.3
 [0.6.2]: https://github.com/artRybka/homebridge-satel/releases/tag/v0.6.2
 [0.6.1]: https://github.com/artRybka/homebridge-satel/releases/tag/v0.6.1
 [0.6.0-beta.0]: https://github.com/artRybka/homebridge-satel/releases/tag/v0.6.0-beta.0
