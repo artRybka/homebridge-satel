@@ -4,6 +4,18 @@ All notable changes to this project are documented here. Format roughly follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and versions use
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.4] — 2026-04-20
+
+### Changed
+
+- GitHub Actions: bump `actions/checkout` and `actions/setup-node` from
+  v4 to v5 so the workflows run on Node 24 natively (deprecation
+  warning fires for Node 20-based actions starting June 2026). Add
+  Node 24 to the CI test matrix alongside 20 and 22; release runner
+  now uses Node 22 (active LTS).
+
+No user-visible runtime change.
+
 ## [0.6.3] — 2026-04-20
 
 ### Fixed
@@ -88,6 +100,7 @@ First public pre-release. Tagged `beta` on npm: install with
   `satel-integra-integration-protocol` library does not yet expose the
   relevant commands. Will return once it does.
 
+[0.6.4]: https://github.com/artRybka/homebridge-satel/releases/tag/v0.6.4
 [0.6.3]: https://github.com/artRybka/homebridge-satel/releases/tag/v0.6.3
 [0.6.2]: https://github.com/artRybka/homebridge-satel/releases/tag/v0.6.2
 [0.6.1]: https://github.com/artRybka/homebridge-satel/releases/tag/v0.6.1
